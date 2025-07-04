@@ -184,7 +184,7 @@ const TodoApp = () => {
 
   useEffect(() => {
     fetchTodos();
-  }, []);
+  }, [fetchTodos]);
 
   if (loading && todos.length === 0) {
     return <LoadingSpinner />;
