@@ -1,6 +1,8 @@
-name: CI for PRs
+name: Test, Lint, Build
 
 on:
+  push:
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
