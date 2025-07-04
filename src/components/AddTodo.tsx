@@ -1,44 +1,54 @@
-
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
 
 interface AddTodoProps {
-  onAdd: (text: string) => void;
+  onAdd: (title: string, description?: string) => void;
 }
 
 const AddTodo = ({ onAdd }: AddTodoProps) => {
-  const [text, setText] = useState('');
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!text.trim()) return;
+
+    if (!title.trim()) return;
 
     setIsSubmitting(true);
     try {
-      await onAdd(text.trim());
-      setText('');
-      console.log('Todo submitted:', text.trim());
+      await onAdd(title.trim(), description.trim() || undefined);
+      setTitle('');
+      setDescription('');
+      console.log('Todo submitted:', title.trim(), description.trim());
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-3">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-3">
       <input
         type="text"
-        value={text}
-        onChange={(e) => setText(e.target.value)}
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
         placeholder="What do you need to do?"
-        className="flex-1 px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition-colors duration-200"
+        className="px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition-colors duration-200"
         disabled={isSubmitting}
       />
+
+      <textarea
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        placeholder="Additional details (optional)"
+        className="px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition-colors duration-200"
+        disabled={isSubmitting}
+      />
+
       <button
         type="submit"
-        disabled={!text.trim() || isSubmitting}
-        className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-2 font-medium"
+        disabled={!title.trim() || isSubmitting}
+        className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-2 font-medium self-start"
       >
         <Plus size={20} />
         {isSubmitting ? 'Adding...' : 'Add'}
