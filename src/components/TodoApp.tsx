@@ -12,6 +12,8 @@ export interface Todo {
   completed: boolean;
   createdAt?: string;
   completedAt?: string;
+  deadlineAt?: string;
+  priority: string;
 }
 
 const TodoApp = () => {
@@ -20,18 +22,16 @@ const TodoApp = () => {
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  // const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-
   // Fetch todos from backend
   const fetchTodos = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // Simulate API call for now - replace with actual API call
+      // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // Mock data matching your format
+      // Mock data matching provided JSON
       const mockResponse = {
         success: true,
         data: [
@@ -41,6 +41,9 @@ const TodoApp = () => {
             description: "Tìm hiểu useState, useEffect, và custom hooks",
             completed: false,
             createdAt: "2024-07-04T12:00:00.000Z",
+            deadlineAt: "2024-07-06T18:00:00.000Z",
+            completedAt: null,
+            priority: "high",
           },
           {
             id: 2,
@@ -49,6 +52,8 @@ const TodoApp = () => {
             completed: true,
             createdAt: "2024-07-03T08:30:00.000Z",
             completedAt: "2024-07-04T10:15:00.000Z",
+            deadlineAt: "2024-07-04T12:00:00.000Z",
+            priority: "medium",
           },
           {
             id: 3,
@@ -56,6 +61,9 @@ const TodoApp = () => {
             description: "Sử dụng Tailwind CSS để tạo layout responsive",
             completed: false,
             createdAt: "2024-07-02T14:20:00.000Z",
+            deadlineAt: "2024-07-08T17:00:00.000Z",
+            completedAt: null,
+            priority: "low",
           },
         ],
         message: "Lấy danh sách to-do thành công",
@@ -64,12 +72,12 @@ const TodoApp = () => {
       setTodos(mockResponse.data);
       console.log("Todos fetched successfully:", mockResponse.data);
     } catch (err) {
-      setError("Failed to fetch todos. Please try again.");
+      setError("Không thể tải danh sách công việc. Vui lòng thử lại.");
       console.error("Error fetching todos:", err);
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "Failed to fetch todos. Please try again.",
+        title: "Lỗi",
+        description: "Không thể tải danh sách công việc. Vui lòng thử lại.",
       });
     } finally {
       setLoading(false);
@@ -77,7 +85,7 @@ const TodoApp = () => {
   };
 
   // Add new todo
-  const addTodo = async (title: string, description?: string) => {
+  const addTodo = async (title: string, description?: string, priority: string = "medium", deadlineAt?: string) => {
     try {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 500));
@@ -88,21 +96,23 @@ const TodoApp = () => {
         description,
         completed: false,
         createdAt: new Date().toISOString(),
+        deadlineAt,
+        priority,
       };
 
       setTodos((prev) => [newTodo, ...prev]);
       console.log("Todo added:", newTodo);
 
       toast({
-        title: "Success",
-        description: "Todo added successfully!",
+        title: "Thành công",
+        description: "Công việc đã được thêm thành công!",
       });
     } catch (err) {
       console.error("Error adding todo:", err);
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "Failed to add todo. Please try again.",
+        title: "Lỗi",
+        description: "Không thể thêm công việc. Vui lòng thử lại.",
       });
     }
   };
@@ -119,29 +129,23 @@ const TodoApp = () => {
       const updatedTodo = {
         ...todoToUpdate,
         completed: !todoToUpdate.completed,
-        completedAt: !todoToUpdate.completed
-          ? new Date().toISOString()
-          : undefined,
+        completedAt: !todoToUpdate.completed ? new Date().toISOString() : undefined,
       };
 
-      setTodos((prev) =>
-        prev.map((todo) => (todo.id === id ? updatedTodo : todo))
-      );
+      setTodos((prev) => prev.map((todo) => (todo.id === id ? updatedTodo : todo)));
 
       console.log("Todo toggled:", id);
 
       toast({
-        title: todoToUpdate.completed
-          ? "Todo marked as incomplete"
-          : "Todo completed!",
-        description: todoToUpdate.completed ? "Keep going!" : "Great job! 🎉",
+        title: todoToUpdate.completed ? "Công việc được đánh dấu chưa hoàn thành" : "Công việc hoàn thành!",
+        description: todoToUpdate.completed ? "Tiếp tục cố gắng!" : "Tuyệt vời! 🎉",
       });
     } catch (err) {
       console.error("Error toggling todo:", err);
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "Failed to update todo. Please try again.",
+        title: "Lỗi",
+        description: "Không thể cập nhật công việc. Vui lòng thử lại.",
       });
     }
   };
@@ -156,15 +160,15 @@ const TodoApp = () => {
       console.log("Todo deleted:", id);
 
       toast({
-        title: "Todo deleted",
-        description: "Todo has been removed successfully.",
+        title: "Công việc đã xóa",
+        description: "Công việc đã được xóa thành công.",
       });
     } catch (err) {
       console.error("Error deleting todo:", err);
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "Failed to delete todo. Please try again.",
+        title: "Lỗi",
+        description: "Không thể xóa công việc. Vui lòng thử lại.",
       });
     }
   };
@@ -185,7 +189,7 @@ const TodoApp = () => {
   const totalCount = todos.length;
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-2xl mx-auto p-4">
       <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
         <AddTodo onAdd={addTodo} />
       </div>
@@ -193,9 +197,9 @@ const TodoApp = () => {
       {totalCount > 0 && (
         <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-800">Your Tasks</h2>
+            <h2 className="text-xl font-semibold text-gray-800">Danh sách công việc</h2>
             <div className="text-sm text-gray-500">
-              {completedCount} of {totalCount} completed
+              {completedCount} / {totalCount} hoàn thành
             </div>
           </div>
 
@@ -203,9 +207,7 @@ const TodoApp = () => {
             <div
               className="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full transition-all duration-500"
               style={{
-                width: `${
-                  totalCount > 0 ? (completedCount / totalCount) * 100 : 0
-                }%`,
+                width: `${totalCount > 0 ? (completedCount / totalCount) * 100 : 0}%`,
               }}
             ></div>
           </div>
@@ -227,10 +229,10 @@ const TodoApp = () => {
         <div className="bg-white rounded-xl shadow-lg p-12 text-center">
           <div className="text-6xl mb-4">📝</div>
           <h3 className="text-xl font-semibold text-gray-700 mb-2">
-            No todos yet
+            Chưa có công việc nào
           </h3>
           <p className="text-gray-500">
-            Add your first todo above to get started!
+            Thêm công việc đầu tiên ở trên để bắt đầu!
           </p>
         </div>
       )}
