@@ -8,9 +8,7 @@ export type FormFieldContextValue<
   name: TName;
 };
 
-export const FormFieldContext = React.createContext<FormFieldContextValue>(
-  {} as FormFieldContextValue
-);
+export const FormFieldContext = React.createContext<any>({});
 
 export const FormField = <
   TFieldValues extends FieldValues = FieldValues,
