@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import TodoItem from "./TodoItem";
 import AddTodo from "./AddTodo";
@@ -25,7 +25,7 @@ const TodoApp = () => {
   // const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
   // Fetch todos from backend
-  const fetchTodos = async () => {
+  const fetchTodos = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -87,7 +87,7 @@ const TodoApp = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
 
   // Add new todo
   const addTodo = async (title: string, description?: string) => {
