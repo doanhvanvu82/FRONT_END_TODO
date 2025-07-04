@@ -1,22 +1,16 @@
 import * as React from "react";
-import { Controller, ControllerProps, FieldPath, FieldValues, useFormContext } from "react-hook-form";
+import { Controller, ControllerProps, useFormContext } from "react-hook-form";
 
-export type FormFieldContextValue<
-  TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
-> = {
-  name: TName;
+export type FormFieldContextValue = {
+  name: string;
 };
 
-export const FormFieldContext = React.createContext<any>({});
+export const FormFieldContext = React.createContext<FormFieldContextValue>({ name: "" });
 
-export const FormField = <
-  TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
->({ ...props }: ControllerProps<TFieldValues, TName>) => {
+export const FormField = ({ name, ...props }: { name: string } & Omit<ControllerProps, 'name'>) => {
   return (
-    <FormFieldContext.Provider value={{ name: props.name }}>
-      <Controller {...props} />
+    <FormFieldContext.Provider value={{ name }}>
+      <Controller name={name} {...props} />
     </FormFieldContext.Provider>
   );
 };
@@ -25,9 +19,7 @@ export type FormItemContextValue = {
   id: string;
 };
 
-export const FormItemContext = React.createContext<FormItemContextValue>(
-  {} as FormItemContextValue
-);
+export const FormItemContext = React.createContext<FormItemContextValue>({ id: "" });
 
 export const useFormField = () => {
   const fieldContext = React.useContext(FormFieldContext);
