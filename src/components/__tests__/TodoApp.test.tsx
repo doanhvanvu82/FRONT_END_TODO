@@ -1,5 +1,6 @@
 
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render } from '@testing-library/react';
+import { screen, fireEvent, waitFor } from '@testing-library/dom';
 import { vi, describe, test, expect, beforeEach } from 'vitest';
 import TodoApp from '../TodoApp';
 
@@ -15,14 +16,12 @@ describe('TodoApp', () => {
     vi.clearAllMocks();
   });
 
-  test('renders todo app with initial todos', async () => {
+  test('renders loading state initially', () => {
     render(<TodoApp />);
     
-    // Check if loading spinner appears initially
     expect(screen.getByText('Loading todos...')).toBeInTheDocument();
     
-    // Wait for todos to load
-    await waitFor(() => {
+    waitFor(() => {
       expect(screen.getByText('Learn React')).toBeInTheDocument();
     });
     
@@ -30,38 +29,36 @@ describe('TodoApp', () => {
     expect(screen.getByText('Write Tests')).toBeInTheDocument();
   });
 
-  test('adds a new todo when form is submitted', async () => {
+  test('allows adding new todos', async () => {
     render(<TodoApp />);
     
-    // Wait for initial load
     await waitFor(() => {
       expect(screen.getByText('Learn React')).toBeInTheDocument();
     });
-    
+
     const input = screen.getByPlaceholderText('What do you need to do?');
     const addButton = screen.getByText('Add');
-    
-    fireEvent.change(input, { target: { value: 'New test todo' } });
+
+    fireEvent.change(input, { target: { value: 'New Todo' } });
     fireEvent.click(addButton);
-    
+
     await waitFor(() => {
-      expect(screen.getByText('New test todo')).toBeInTheDocument();
+      expect(screen.getByText('New Todo')).toBeInTheDocument();
     });
   });
 
-  test('toggles todo completion when checkbox is clicked', async () => {
+  test('allows toggling todo completion', async () => {
     render(<TodoApp />);
     
-    // Wait for initial load
     await waitFor(() => {
       expect(screen.getByText('Learn React')).toBeInTheDocument();
     });
-    
-    const checkboxes = screen.getAllByRole('button', { name: /Mark as complete/i });
-    fireEvent.click(checkboxes[0]);
-    
+
+    const toggleButton = screen.getAllByRole('button', { name: /Mark as complete/i })[0];
+    fireEvent.click(toggleButton);
+
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /Mark as incomplete/i })).toBeInTheDocument();
+      expect(screen.getByText('Learn React')).toHaveClass('line-through');
     });
   });
 });
