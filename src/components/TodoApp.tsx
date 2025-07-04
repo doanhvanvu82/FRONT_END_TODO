@@ -8,9 +8,11 @@ import ErrorMessage from './ErrorMessage';
 
 export interface Todo {
   id: number;
-  text: string;
+  title: string;
+  description?: string;
   completed: boolean;
   createdAt?: string;
+  completedAt?: string;
 }
 
 const TodoApp = () => {
@@ -30,15 +32,38 @@ const TodoApp = () => {
       // Simulate API call for now - replace with actual API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Mock data - replace with actual fetch call
-      const mockTodos: Todo[] = [
-        { id: 1, text: "Learn React", completed: false, createdAt: new Date().toISOString() },
-        { id: 2, text: "Build Todo App", completed: false, createdAt: new Date().toISOString() },
-        { id: 3, text: "Write Tests", completed: false, createdAt: new Date().toISOString() }
-      ];
+      // Mock data matching your format
+      const mockResponse = {
+        success: true,
+        data: [
+          {
+            id: 1,
+            title: "Học React Hooks",
+            description: "Tìm hiểu useState, useEffect, và custom hooks",
+            completed: false,
+            createdAt: "2024-07-04T12:00:00.000Z"
+          },
+          {
+            id: 2,
+            title: "Viết unit test với Jest",
+            description: "Viết ít nhất 3 bài test cho component TodoList",
+            completed: true,
+            createdAt: "2024-07-03T08:30:00.000Z",
+            completedAt: "2024-07-04T10:15:00.000Z"
+          },
+          {
+            id: 3,
+            title: "Thiết kế giao diện responsive",
+            description: "Sử dụng Tailwind CSS để tạo layout responsive",
+            completed: false,
+            createdAt: "2024-07-02T14:20:00.000Z"
+          }
+        ],
+        message: "Lấy danh sách to-do thành công"
+      };
       
-      setTodos(mockTodos);
-      console.log('Todos fetched successfully:', mockTodos);
+      setTodos(mockResponse.data);
+      console.log('Todos fetched successfully:', mockResponse.data);
     } catch (err) {
       setError('Failed to fetch todos. Please try again.');
       console.error('Error fetching todos:', err);
@@ -53,14 +78,14 @@ const TodoApp = () => {
   };
 
   // Add new todo
-  const addTodo = async (text: string) => {
+  const addTodo = async (title: string) => {
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 500));
       
       const newTodo: Todo = {
         id: Date.now(),
-        text,
+        title,
         completed: false,
         createdAt: new Date().toISOString()
       };
@@ -91,9 +116,15 @@ const TodoApp = () => {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 300));
       
+      const updatedTodo = {
+        ...todoToUpdate,
+        completed: !todoToUpdate.completed,
+        completedAt: !todoToUpdate.completed ? new Date().toISOString() : undefined
+      };
+      
       setTodos(prev => 
         prev.map(todo => 
-          todo.id === id ? { ...todo, completed: !todo.completed } : todo
+          todo.id === id ? updatedTodo : todo
         )
       );
       

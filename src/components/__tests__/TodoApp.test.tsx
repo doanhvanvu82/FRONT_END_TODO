@@ -1,4 +1,6 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+
+import { render } from '@testing-library/react';
+import { screen, fireEvent, waitFor } from '@testing-library/dom';
 import { vi, describe, test, expect, beforeEach } from 'vitest';
 import TodoApp from '../TodoApp';
 
