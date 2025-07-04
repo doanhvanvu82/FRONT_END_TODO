@@ -1,4 +1,3 @@
-
 version: '3.8'
 
 services:
@@ -21,18 +20,6 @@ services:
       - "5000:5000"
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=mongodb://mongo:27017/todoapp
-    depends_on:
-      - mongo
-    networks:
-      - todo-network
-
-  mongo:
-    image: mongo:7
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
     networks:
       - todo-network
 
