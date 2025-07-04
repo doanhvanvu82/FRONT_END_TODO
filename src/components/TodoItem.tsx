@@ -1,4 +1,3 @@
-
 import { Check, Trash2 } from 'lucide-react';
 import { Todo } from './TodoApp';
 
@@ -46,6 +45,19 @@ const TodoItem = ({ todo, onToggle, onDelete }: TodoItemProps) => {
             : 'text-gray-800'
         }`}>
           {todo.title}
+          {todo.priority && (
+            <span
+              className={`ml-2 px-2 py-0.5 rounded-full text-xs font-bold
+                ${todo.priority === 'high' ? 'bg-red-100 text-red-600' : ''}
+                ${todo.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' : ''}
+                ${todo.priority === 'low' ? 'bg-gray-200 text-gray-700' : ''}
+              `}
+            >
+              {todo.priority === 'high' && 'Ưu tiên cao'}
+              {todo.priority === 'medium' && 'Trung bình'}
+              {todo.priority === 'low' && 'Thấp'}
+            </span>
+          )}
         </h3>
         
         {todo.description && (
@@ -58,11 +70,14 @@ const TodoItem = ({ todo, onToggle, onDelete }: TodoItemProps) => {
           </p>
         )}
 
-        {todo.completed && todo.completedAt && (
-          <div className="mt-2 text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full inline-block">
-            Hoàn thành: {formatDate(todo.completedAt)}
-          </div>
-        )}
+        {/* Dates row: createdAt, deadlineAt, completedAt */}
+        <div className="flex flex-row gap-4 mt-2 text-xs">
+          <span className="font-semibold text-blue-600 bg-blue-100 px-2 py-1 rounded-full">Tạo: {formatDate(todo.createdAt)}</span>
+          <span className="font-semibold text-orange-600 bg-orange-100 px-2 py-1 rounded-full">Hạn: {formatDate(todo.deadlineAt)}</span>
+          {todo.completed && todo.completedAt && (
+            <span className="font-semibold text-green-600 bg-green-100 px-2 py-1 rounded-full">Hoàn thành: {formatDate(todo.completedAt)}</span>
+          )}
+        </div>
       </div>
 
       <button

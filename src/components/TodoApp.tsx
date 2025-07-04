@@ -12,6 +12,8 @@ export interface Todo {
   completed: boolean;
   createdAt?: string;
   completedAt?: string;
+  deadlineAt?: string;
+  priority?: 'low' | 'medium' | 'high';
 }
 
 const TodoApp = () => {
@@ -41,6 +43,9 @@ const TodoApp = () => {
             description: "Tìm hiểu useState, useEffect, và custom hooks",
             completed: false,
             createdAt: "2024-07-04T12:00:00.000Z",
+            deadlineAt: "2024-07-06T18:00:00.000Z",
+            completedAt: null,
+            priority: "high"
           },
           {
             id: 2,
@@ -49,6 +54,8 @@ const TodoApp = () => {
             completed: true,
             createdAt: "2024-07-03T08:30:00.000Z",
             completedAt: "2024-07-04T10:15:00.000Z",
+            deadlineAt: "2024-07-04T12:00:00.000Z",
+            priority: "medium"
           },
           {
             id: 3,
@@ -56,12 +63,18 @@ const TodoApp = () => {
             description: "Sử dụng Tailwind CSS để tạo layout responsive",
             completed: false,
             createdAt: "2024-07-02T14:20:00.000Z",
-          },
+            deadlineAt: "2024-07-08T17:00:00.000Z",
+            completedAt: null,
+            priority: "low"
+          }
         ],
-        message: "Lấy danh sách to-do thành công",
+        message: "Lấy danh sách to-do thành công"
       };
 
-      setTodos(mockResponse.data);
+      setTodos(mockResponse.data.map(todo => ({
+        ...todo,
+        priority: todo.priority as 'low' | 'medium' | 'high'
+      })));
       console.log("Todos fetched successfully:", mockResponse.data);
     } catch (err) {
       setError("Failed to fetch todos. Please try again.");
