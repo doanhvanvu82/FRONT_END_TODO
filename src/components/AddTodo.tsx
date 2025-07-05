@@ -1,7 +1,15 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
+import { useState } from "react";
+import { Plus } from "lucide-react";
 
 interface AddTodoProps {
+  onAdd: (
+    title: string,
+    description?: string,
+    priority?: "low" | "medium" | "high",
+    deadlineAt?: string
+  ) => void;
   onAdd: (
     title: string,
     description?: string,
@@ -13,7 +21,11 @@ interface AddTodoProps {
 const AddTodo = ({ onAdd }: AddTodoProps) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [priority, setPriority] = useState<"low" | "medium" | "high">("medium");
+  const [deadlineAt, setDeadlineAt] = useState("");
   const [priority, setPriority] = useState<"low" | "medium" | "high">("medium");
   const [deadlineAt, setDeadlineAt] = useState("");
 
@@ -35,6 +47,18 @@ const AddTodo = ({ onAdd }: AddTodoProps) => {
       setDescription("");
       setPriority("medium");
       setDeadlineAt("");
+      console.log("Todo submitted:", title.trim(), description.trim());
+      await onAdd(
+        title.trim(),
+        description.trim() || undefined,
+        priority,
+        deadlineAt ? new Date(deadlineAt).toISOString() : undefined
+      );
+
+      setTitle("");
+      setDescription("");
+      setPriority("medium"); // reset về mặc định
+      setDeadlineAt(""); // reset input ngày giờ
       console.log("Todo submitted:", title.trim(), description.trim());
     } finally {
       setIsSubmitting(false);
