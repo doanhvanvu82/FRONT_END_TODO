@@ -111,9 +111,9 @@ const AddTodo = ({ onAdd }: AddTodoProps) => {
                   className={`px-4 py-2 rounded-xl border-2 font-semibold transition-all duration-200 ${colorClass} transform ${transform} hover:scale-105`}
                   disabled={isSubmitting}
                 >
-                  {level === "low" && "🟢 Low Priority"}
-                  {level === "medium" && "🟡 Medium Priority"}
-                  {level === "high" && "🔴 High Priority"}
+                  {level === "low" && "🟢 Ưu tiên thấp"}
+                  {level === "medium" && "🟡 Ưu tiên trung bình"}
+                  {level === "high" && "🔴 Ưu tiên cao"}
                 </button>
               );
             })}
