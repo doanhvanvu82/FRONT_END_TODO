@@ -73,7 +73,7 @@ const TodoItem = ({ todo, onToggle, onDelete }: TodoItemProps) => {
             
             {todo.priority && (
               <span className={`px-3 py-1 rounded-full text-xs font-bold ${getPriorityStyles(todo.priority)}`}>
-                {todo.priority === 'high' && '🔴 Cao'}
+                {todo.priority === 'high' && '🔴 Ưu tiên cao'}
                 {todo.priority === 'medium' && '🟡 Trung bình'}
                 {todo.priority === 'low' && '🟢 Thấp'}
               </span>
