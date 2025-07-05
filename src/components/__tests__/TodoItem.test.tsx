@@ -22,7 +22,8 @@ describe('TodoItem', () => {
     render(<TodoItem todo={mockTodo} onToggle={mockOnToggle} onDelete={mockOnDelete} />);
     expect(screen.getByText('Test todo')).toBeInTheDocument();
     expect(screen.getByText('Test description')).toBeInTheDocument();
-    expect(screen.getByText('🔴 Cao')).toBeInTheDocument();
+    expect(screen.getByText(/Ưu tiên cao/)).toBeInTheDocument();
+    expect(screen.getByText('🔴 Ưu tiên cao')).toBeInTheDocument();
     expect(screen.getByText(/Tạo:/i)).toBeInTheDocument();
     expect(screen.getByText(/Hạn:/i)).toBeInTheDocument();
   });
