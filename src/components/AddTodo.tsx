@@ -1,15 +1,7 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
-import { useState } from "react";
-import { Plus } from "lucide-react";
 
 interface AddTodoProps {
-  onAdd: (
-    title: string,
-    description?: string,
-    priority?: "low" | "medium" | "high",
-    deadlineAt?: string
-  ) => void;
   onAdd: (
     title: string,
     description?: string,
@@ -21,14 +13,9 @@ interface AddTodoProps {
 const AddTodo = ({ onAdd }: AddTodoProps) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [priority, setPriority] = useState<"low" | "medium" | "high">("medium");
   const [deadlineAt, setDeadlineAt] = useState("");
-  const [priority, setPriority] = useState<"low" | "medium" | "high">("medium");
-  const [deadlineAt, setDeadlineAt] = useState("");
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -36,18 +23,6 @@ const AddTodo = ({ onAdd }: AddTodoProps) => {
 
     setIsSubmitting(true);
     try {
-      await onAdd(
-        title.trim(),
-        description.trim() || undefined,
-        priority,
-        deadlineAt ? new Date(deadlineAt).toISOString() : undefined
-      );
-
-      setTitle("");
-      setDescription("");
-      setPriority("medium");
-      setDeadlineAt("");
-      console.log("Todo submitted:", title.trim(), description.trim());
       await onAdd(
         title.trim(),
         description.trim() || undefined,
