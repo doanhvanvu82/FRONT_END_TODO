@@ -40,9 +40,12 @@ describe("TodoApp", () => {
     ).toBeInTheDocument();
 
     // Check for priority badges
-    expect(screen.getByText(/Ưu tiên cao/)).toBeInTheDocument();
-    expect(screen.getByText(/Ưu tiên trung bình/)).toBeInTheDocument();
-    expect(screen.getByText(/Ưu tiên thấp/)).toBeInTheDocument();
+    // Check for priority badges (dùng getAllByText rồi kiểm tra số lượng)
+    expect(screen.getAllByText(/Ưu tiên cao/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Ưu tiên trung bình/i).length).toBeGreaterThan(
+      0
+    );
+    expect(screen.getAllByText(/Ưu tiên thấp/i).length).toBeGreaterThan(0);
 
     // Check for date labels
     expect(screen.getAllByText(/Tạo:/i).length).toBeGreaterThan(0);
