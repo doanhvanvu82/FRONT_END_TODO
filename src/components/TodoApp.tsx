@@ -86,6 +86,8 @@ const TodoApp = () => {
     }
   }, [toast]);
 
+
+  // Add new todo
   const addTodo = async (
     title: string,
     description?: string,
