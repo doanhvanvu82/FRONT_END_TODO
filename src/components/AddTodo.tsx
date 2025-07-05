@@ -60,18 +60,35 @@ const AddTodo = ({ onAdd }: AddTodoProps) => {
         disabled={isSubmitting}
       />
 
-      <select
-        value={priority}
-        onChange={(e) =>
-          setPriority(e.target.value as "low" | "medium" | "high")
-        }
-        className="px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 transition-colors"
-        disabled={isSubmitting}
-      >
-        <option value="low">Low priority</option>
-        <option value="medium">Medium priority</option>
-        <option value="high">High priority</option>
-      </select>
+      <div className="flex gap-3">
+        {["low", "medium", "high"].map((level) => {
+          const isActive = priority === level;
+          const color =
+            level === "low"
+              ? "bg-green-200 text-green-800"
+              : level === "medium"
+              ? "bg-yellow-200 text-yellow-800"
+              : "bg-red-200 text-red-800";
+
+          const border = isActive
+            ? "ring-2 ring-offset-2 ring-blue-500"
+            : "border";
+
+          return (
+            <button
+              key={level}
+              type="button"
+              onClick={() => setPriority(level as "low" | "medium" | "high")}
+              className={`px-4 py-2 rounded-lg ${color} ${border} transition-all`}
+              disabled={isSubmitting}
+            >
+              {level === "low" && "🔵 Low"}
+              {level === "medium" && "🟠 Medium"}
+              {level === "high" && "🔴 High"}
+            </button>
+          );
+        })}
+      </div>
 
       <input
         type="datetime-local"
