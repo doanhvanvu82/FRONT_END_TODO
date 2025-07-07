@@ -21,7 +21,11 @@ describe("TodoItem", () => {
     const mockOnDelete = vi.fn();
 
     const { container } = render(
-      <TodoItem todo={mockTodo} onToggle={mockOnToggle} onDelete={mockOnDelete} />
+      <TodoItem
+        todo={mockTodo}
+        onToggle={mockOnToggle}
+        onDelete={mockOnDelete}
+      />
     );
 
     const todoWrapper = container; // or add `data-testid="todo-item"` nếu cần giới hạn
@@ -30,33 +34,61 @@ describe("TodoItem", () => {
     expect(screen.getByText("Test description")).toBeInTheDocument();
 
     // Ưu tiên cao có thể xuất hiện ở badge và nút => check bằng getAllByText
-    const priorityBadges = screen.getAllByText(/Ưu tiên cao/);
+    const priorityBadges = screen.getAllByText(/🔴 Cao/i);
     expect(priorityBadges.length).toBeGreaterThanOrEqual(1);
 
-    expect(screen.getByText("🔴 Ưu tiên cao")).toBeInTheDocument();
-    expect(screen.getByText(/Tạo:/i)).toBeInTheDocument();
-    expect(screen.getByText(/Hạn:/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/🔴 Cao/i).length).toBeGreaterThan(0);
+    expect(
+      screen.getByText((content) => content.includes("Đã tạo"))
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText((content) => content.includes("Hạn chót"))
+    ).toBeInTheDocument();
   });
 
   test("calls onToggle when checkbox is clicked", () => {
     const mockOnToggle = vi.fn();
     const mockOnDelete = vi.fn();
 
-    render(<TodoItem todo={mockTodo} onToggle={mockOnToggle} onDelete={mockOnDelete} />);
+    render(
+      <TodoItem
+        todo={mockTodo}
+        onToggle={mockOnToggle}
+        onDelete={mockOnDelete}
+      />
+    );
 
-    const toggleButton = screen.getByRole("button", { name: /Mark as complete/i });
+    const toggleButton = screen.getAllByRole("button", {
+      name: /Đánh dấu là đã hoàn thành/i,
+    })[0];
+
     fireEvent.click(toggleButton);
     expect(mockOnToggle).toHaveBeenCalledWith(1);
   });
 
-  test("calls onDelete when delete button is clicked", () => {
+  test("calls onDelete when delete is confirmed in dialog", async () => {
     const mockOnToggle = vi.fn();
     const mockOnDelete = vi.fn();
 
-    render(<TodoItem todo={mockTodo} onToggle={mockOnToggle} onDelete={mockOnDelete} />);
+    render(
+      <TodoItem
+        todo={mockTodo}
+        onToggle={mockOnToggle}
+        onDelete={mockOnDelete}
+      />
+    );
 
-    const deleteButton = screen.getByRole("button", { name: /Delete todo/i });
-    fireEvent.click(deleteButton);
+    // Bước 1: Click vào nút mở dialog
+    const triggerDeleteButton = screen.getByRole("button", {
+      name: /Xoá công việc/i,
+    });
+    fireEvent.click(triggerDeleteButton);
+
+    // Bước 2: Click nút xác nhận "Xóa"
+    const confirmButton = await screen.findByRole("button", { name: /^Xóa$/i });
+    fireEvent.click(confirmButton);
+
+    // ✅ Kiểm tra xem đã gọi hàm onDelete
     expect(mockOnDelete).toHaveBeenCalledWith(1);
   });
 
@@ -70,7 +102,13 @@ describe("TodoItem", () => {
     const mockOnToggle = vi.fn();
     const mockOnDelete = vi.fn();
 
-    render(<TodoItem todo={completedTodo} onToggle={mockOnToggle} onDelete={mockOnDelete} />);
+    render(
+      <TodoItem
+        todo={completedTodo}
+        onToggle={mockOnToggle}
+        onDelete={mockOnDelete}
+      />
+    );
 
     const todoText = screen.getByText("Test todo");
     expect(todoText).toHaveClass("line-through");

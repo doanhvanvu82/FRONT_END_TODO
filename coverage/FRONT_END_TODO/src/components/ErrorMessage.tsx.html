@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">21.42% </span>
+                <span class="strong">25% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>3/14</span>
+                <span class='fraction'>4/16</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">21.42% </span>
+                <span class="strong">25% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>3/14</span>
+                <span class='fraction'>4/16</span>
             </div>
         
             
@@ -90,7 +90,11 @@
 <a name='L25'></a><a href='#L25'>25</a>
 <a name='L26'></a><a href='#L26'>26</a>
 <a name='L27'></a><a href='#L27'>27</a>
-<a name='L28'></a><a href='#L28'>28</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -101,57 +105,59 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">&nbsp;
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span></td><td class="text"><pre class="prettyprint lang-js">&nbsp;
+import { AlertCircle, RefreshCw } from "lucide-react";
+&nbsp;
 interface ErrorMessageProps {
   message: string;
-  onRetry?: () =&gt; void;
+  onRetry: () =&gt; void;
 }
 &nbsp;
 const ErrorMessage = <span class="fstat-no" title="function not covered" >({ message, onRetry }: ErrorMessageProps) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >  return (</span>
-<span class="cstat-no" title="statement not covered" >    &lt;div className="bg-red-50 border-2 border-red-200 rounded-xl p-8 text-center"&gt;</span>
-<span class="cstat-no" title="statement not covered" >      &lt;div className="text-4xl mb-4"&gt;⚠️&lt;/div&gt;</span>
-<span class="cstat-no" title="statement not covered" >      &lt;h3 className="text-xl font-semibold text-red-800 mb-2"&gt;</span>
-        Something went wrong
-      &lt;/h3&gt;
-<span class="cstat-no" title="statement not covered" >      &lt;p className="text-red-600 mb-4"&gt;{message}&lt;/p&gt;</span>
-<span class="cstat-no" title="statement not covered" >      {onRetry &amp;&amp; (</span>
+<span class="cstat-no" title="statement not covered" >    &lt;div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center"&gt;</span>
+<span class="cstat-no" title="statement not covered" >      &lt;div className="text-center max-w-md mx-auto p-8"&gt;</span>
+<span class="cstat-no" title="statement not covered" >        &lt;div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4"&gt;</span>
+<span class="cstat-no" title="statement not covered" >          &lt;AlertCircle size={32} className="text-red-500" /&gt;</span>
+        &lt;/div&gt;
+<span class="cstat-no" title="statement not covered" >        &lt;h3 className="text-xl font-bold text-gray-800 mb-2"&gt;Something went wrong&lt;/h3&gt;</span>
+<span class="cstat-no" title="statement not covered" >        &lt;p className="text-gray-600 mb-6"&gt;{message}&lt;/p&gt;</span>
 <span class="cstat-no" title="statement not covered" >        &lt;button</span>
 <span class="cstat-no" title="statement not covered" >          onClick={onRetry}</span>
-<span class="cstat-no" title="statement not covered" >          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-200"</span>
-<span class="cstat-no" title="statement not covered" >        &gt;</span>
+<span class="cstat-no" title="statement not covered" >          className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-all duration-200 font-semibold"</span>
+        &gt;
+<span class="cstat-no" title="statement not covered" >          &lt;RefreshCw size={18} /&gt;</span>
           Try Again
         &lt;/button&gt;
-      )}
+      &lt;/div&gt;
     &lt;/div&gt;
   );
 <span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
-export default ErrorMessage;
-&nbsp;</pre></td></tr></table></pre>
+export default ErrorMessage;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-05T09:30:34.661Z
+                at 2025-07-07T14:49:57.655Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
