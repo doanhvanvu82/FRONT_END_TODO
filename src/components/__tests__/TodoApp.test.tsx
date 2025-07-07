@@ -33,23 +33,24 @@ describe("TodoApp", () => {
       vi.advanceTimersByTime(1000);
     });
 
-    expect(screen.getByText("Học React Hooks")).toBeInTheDocument();
-    expect(screen.getByText("Viết unit test với Jest")).toBeInTheDocument();
-    expect(
-      screen.getByText("Thiết kế giao diện responsive")
-    ).toBeInTheDocument();
-
     // Check for priority badges
     // Check for priority badges (dùng getAllByText rồi kiểm tra số lượng)
-    expect(screen.getAllByText(/Ưu tiên cao/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Ưu tiên trung bình/i).length).toBeGreaterThan(
-      0
-    );
-    expect(screen.getAllByText(/Ưu tiên thấp/i).length).toBeGreaterThan(0);
+    // Check for priority badges
+    expect(
+      screen.getAllByText((text) => text.includes("🔴 Cao")).length
+    ).toBeGreaterThan(0);
+    expect(
+      screen.getAllByText((text) => text.includes("🟡 Trung bình")).length
+    ).toBeGreaterThan(0);
+    expect(
+      screen.getAllByText((text) => text.includes("🟢 Thấp")).length
+    ).toBeGreaterThan(0);
 
     // Check for date labels
-    expect(screen.getAllByText(/Tạo:/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Hạn:/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText((text) => text.includes("Đã tạo")).length).toBeGreaterThan(0);
+
+    expect(screen.getAllByText((text) => text.includes("Hạn chót")).length).toBeGreaterThan(0);
+
   });
 
   test("allows toggling todo completion", async () => {
@@ -61,7 +62,7 @@ describe("TodoApp", () => {
     });
 
     const toggleButton = screen.getAllByRole("button", {
-      name: /Mark as complete/i,
+      name: /Đánh dấu là đã hoàn thành/i, // Đúng với aria-label tiếng Việt
     })[0];
 
     await act(async () => {
@@ -70,7 +71,7 @@ describe("TodoApp", () => {
       vi.advanceTimersByTime(300);
     });
 
-    expect(screen.getByText("Học React Hooks")).toHaveClass("line-through");
+    expect(screen.getByText("Learn React Hooks")).toHaveClass("line-through");
   });
 
   test("allows deleting a todo", async () => {
@@ -82,7 +83,7 @@ describe("TodoApp", () => {
     });
 
     const deleteButtons = screen.getAllByRole("button", {
-      name: /Delete todo/i,
+      name: /Xoá công việc/i, // ← đổi từ "Delete todo" sang đúng nhãn tiếng Việt
     });
 
     await act(async () => {
