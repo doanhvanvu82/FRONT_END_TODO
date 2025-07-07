@@ -22,18 +22,13 @@ const TodoApp = () => {
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  // const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-
-  // Fetch todos from backend
   const fetchTodos = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // Simulate API call for now - replace with actual API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // Mock data matching your format
       const mockResponse = {
         success: true,
         data: [
@@ -91,6 +86,7 @@ const TodoApp = () => {
     }
   }, [toast]);
 
+
   // Add new todo
   const addTodo = async (
     title: string,
@@ -99,7 +95,6 @@ const TodoApp = () => {
     deadlineAt?: string
   ) => {
     try {
-      // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 500));
 
       const newTodo: Todo = {
@@ -129,13 +124,11 @@ const TodoApp = () => {
     }
   };
 
-  // Toggle todo completion
   const toggleTodo = async (id: number) => {
     try {
       const todoToUpdate = todos.find((todo) => todo.id === id);
       if (!todoToUpdate) return;
 
-      // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 300));
 
       const updatedTodo = {
@@ -168,10 +161,8 @@ const TodoApp = () => {
     }
   };
 
-  // Delete todo
   const deleteTodo = async (id: number) => {
     try {
-      // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 300));
 
       setTodos((prev) => prev.filter((todo) => todo.id !== id));
@@ -207,55 +198,77 @@ const TodoApp = () => {
   const totalCount = todos.length;
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-        <AddTodo onAdd={addTodo} />
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 py-8 px-4">
+      <div className="max-w-3xl mx-auto">
+   
+        {/* Add Todo Section */}
+        <div className="mb-8">
+          <AddTodo onAdd={addTodo} />
+        </div>
 
-      {totalCount > 0 && (
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-800">Your Tasks</h2>
-            <div className="text-sm text-gray-500">
-              {completedCount} of {totalCount} completed
+        {/* Tasks Overview */}
+        {totalCount > 0 && (
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 p-8 mb-8">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">{totalCount}</span>
+                </div>
+                Your Tasks
+              </h2>
+              <div className="text-right">
+                <div className="text-2xl font-bold text-gray-800">{completedCount}/{totalCount}</div>
+                <div className="text-sm text-gray-500">completed</div>
+              </div>
+            </div>
+
+            {/* Enhanced Progress Bar */}
+            <div className="relative mb-8">
+              <div className="w-full bg-gray-200 rounded-full h-3 shadow-inner">
+                <div
+                  className="bg-gradient-to-r from-green-400 via-emerald-500 to-teal-500 h-3 rounded-full transition-all duration-700 ease-out shadow-lg relative overflow-hidden"
+                  style={{
+                    width: `${
+                      totalCount > 0 ? (completedCount / totalCount) * 100 : 0
+                    }%`,
+                  }}
+                >
+                  <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
+                </div>
+              </div>
+              <div className="absolute -top-1 -right-1 text-xs font-semibold text-gray-600 bg-white px-2 py-1 rounded-full shadow-sm border">
+                {Math.round((completedCount / totalCount) * 100) || 0}%
+              </div>
+            </div>
+
+            {/* Todo List */}
+            <div className="space-y-4">
+              {todos.map((todo) => (
+                <TodoItem
+                  key={todo.id}
+                  todo={todo}
+                  onToggle={toggleTodo}
+                  onDelete={deleteTodo}
+                />
+              ))}
             </div>
           </div>
+        )}
 
-          <div className="w-full bg-gray-200 rounded-full h-2 mb-6">
-            <div
-              className="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full transition-all duration-500"
-              style={{
-                width: `${
-                  totalCount > 0 ? (completedCount / totalCount) * 100 : 0
-                }%`,
-              }}
-            ></div>
+        {/* Empty State */}
+        {totalCount === 0 && !loading && (
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 p-16 text-center">
+            <div className="text-8xl mb-6 opacity-50">📝</div>
+            <h3 className="text-2xl font-bold text-gray-700 mb-3">
+              Ready to be productive?
+            </h3>
+            <p className="text-gray-500 text-lg mb-6">
+              Create your first task and start organizing your life!
+            </p>
+            <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full mx-auto"></div>
           </div>
-
-          <div className="space-y-3">
-            {todos.map((todo) => (
-              <TodoItem
-                key={todo.id}
-                todo={todo}
-                onToggle={toggleTodo}
-                onDelete={deleteTodo}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {totalCount === 0 && !loading && (
-        <div className="bg-white rounded-xl shadow-lg p-12 text-center">
-          <div className="text-6xl mb-4">📝</div>
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">
-            No todos yet
-          </h3>
-          <p className="text-gray-500">
-            Add your first todo above to get started!
-          </p>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
