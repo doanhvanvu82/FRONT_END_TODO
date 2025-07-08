@@ -1,125 +1,218 @@
-import { Check, Trash2 } from 'lucide-react';
-import { Todo } from './TodoApp';
-
+import { Check, Trash2, Calendar, MoreHorizontal } from "lucide-react";
+import { Todo } from "./TodoApp";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useState } from "react";
 interface TodoItemProps {
   todo: Todo;
   onToggle: (id: number) => void;
   onDelete: (id: number) => void;
 }
 
+const getBorderColorClass = (priority?: "low" | "medium" | "high") => {
+  switch (priority) {
+    case "low":
+      return "border-green-500";
+    case "medium":
+      return "border-yellow-500";
+    case "high":
+      return "border-red-500";
+    default:
+      return "border-gray-400";
+  }
+};
+
+const getColorClass = (priority?: "low" | "medium" | "high") => {
+  switch (priority) {
+    case "low":
+      return "bg-green-500 hover:bg-green-600";
+    case "medium":
+      return "bg-yellow-500 hover:bg-yellow-600";
+    case "high":
+      return "bg-red-500 hover:bg-red-600";
+    default:
+      return "bg-gray-500 hover:bg-gray-600";
+  }
+};
+
 const TodoItem = ({ todo, onToggle, onDelete }: TodoItemProps) => {
+  const [isTicking, setIsTicking] = useState(false);
   const formatDate = (dateString?: string) => {
-    if (!dateString) return '';
+    if (!dateString) return "";
     const date = new Date(dateString);
-    return date.toLocaleDateString('vi-VN', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    const now = new Date();
+
+    const isSameDay = (d1: Date, d2: Date) =>
+      d1.getFullYear() === d2.getFullYear() &&
+      d1.getMonth() === d2.getMonth() &&
+      d1.getDate() === d2.getDate();
+
+    const isTomorrow = (d: Date) => {
+      const tomorrow = new Date();
+      tomorrow.setDate(now.getDate() + 1);
+      return isSameDay(d, tomorrow);
+    };
+
+    const isYesterday = (d: Date) => {
+      const yesterday = new Date();
+      yesterday.setDate(now.getDate() - 1);
+      return isSameDay(d, yesterday);
+    };
+
+    const getWeekNumber = (d: Date) => {
+      const oneJan = new Date(d.getFullYear(), 0, 1);
+      const numberOfDays = Math.floor(
+        (d.getTime() - oneJan.getTime()) / (24 * 60 * 60 * 1000)
+      );
+      return Math.ceil((d.getDay() + 1 + numberOfDays) / 7);
+    };
+
+    const dayOfWeek = date.toLocaleDateString("en-US", { weekday: "short" });
+    const timeString = date.toLocaleTimeString("en-GB", {
+      hour: "2-digit",
+      minute: "2-digit",
     });
+
+    const nowWeek = getWeekNumber(now);
+    const dateWeek = getWeekNumber(date);
+    const sameWeek =
+      nowWeek === dateWeek && date.getFullYear() === now.getFullYear();
+
+    if (isSameDay(date, now)) return `Today at ${timeString}`;
+    if (isTomorrow(date)) return `Tomorrow at ${timeString}`;
+    if (isYesterday(date)) return `Yesterday at ${timeString}`;
+    if (sameWeek) return `${dayOfWeek} at ${timeString}`;
+
+    return `${date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    })} at ${timeString}`;
   };
 
-  const getPriorityStyles = (priority?: string) => {
-    switch (priority) {
-      case 'high':
-        return 'bg-red-100 text-red-700 border border-red-200';
-      case 'medium':
-        return 'bg-yellow-100 text-yellow-700 border border-yellow-200';
-      case 'low':
-        return 'bg-green-100 text-green-700 border border-green-200';
-      default:
-        return 'bg-gray-100 text-gray-700 border border-gray-200';
-    }
+  // Hàm lấy số tuần của 1 ngày trong năm
+  const getWeekNumber = (date: Date): number => {
+    const firstDay = new Date(date.getFullYear(), 0, 1);
+    const pastDaysOfYear = (date.getTime() - firstDay.getTime()) / 86400000;
+    return Math.ceil((pastDaysOfYear + firstDay.getDay() + 1) / 7);
   };
+
+  const isOverdue =
+    todo.deadlineAt &&
+    new Date(todo.deadlineAt) < new Date() &&
+    !todo.completed;
 
   return (
-    <div className={`group relative overflow-hidden rounded-2xl border-2 transition-all duration-300 transform hover:scale-[1.02] ${
-      todo.completed 
-        ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 shadow-md shadow-green-100' 
-        : 'bg-white border-gray-200 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-100'
-    }`}>
-      {/* Priority indicator bar */}
-      {todo.priority && (
-        <div className={`absolute top-0 left-0 right-0 h-1 ${
-          todo.priority === 'high' ? 'bg-gradient-to-r from-red-400 to-red-500' :
-          todo.priority === 'medium' ? 'bg-gradient-to-r from-yellow-400 to-yellow-500' :
-          'bg-gradient-to-r from-green-400 to-green-500'
-        }`} />
-      )}
-      
-      <div className="flex items-start p-6 pt-7">
+    <div className="border-b last:border-none border-gray-200/60 py-2 px-1 group hover:bg-gray-50/50 transition-colors duration-200">
+      <div className="flex items-start gap-2">
+        {/* Enhanced Checkbox with animations */}
         <button
-          onClick={() => onToggle(todo.id)}
-          className={`flex-shrink-0 w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all duration-300 mt-1 shadow-sm ${
+          onClick={() => {
+            if (todo.completed) {
+              onToggle(todo.id); // nếu đã completed thì toggle luôn
+            } else {
+              setIsTicking(true); // hiển thị dấu tích giả
+              setTimeout(() => {
+                setIsTicking(false);
+                onToggle(todo.id); // sau delay mới toggle thật
+              }, 1000); // delay 400ms
+            }
+          }}
+          className={`w-[14px] h-[14px] mt-1 border-2 rounded-sm flex items-center justify-center transition-all duration-300 transform hover:scale-110 active:scale-95 shadow-sm ${
             todo.completed
-              ? 'bg-gradient-to-r from-green-500 to-emerald-500 border-green-500 text-white shadow-lg shadow-green-200'
-              : 'border-gray-300 hover:border-blue-500 hover:bg-blue-50 hover:shadow-md'
+              ? `${getColorClass(todo.priority)} ${getBorderColorClass(
+                  todo.priority
+                )} text-white shadow-md`
+              : `${getBorderColorClass(
+                  todo.priority
+                )} hover:border-opacity-80 hover:shadow-md bg-white`
           }`}
-          aria-label={todo.completed ? 'Mark as incomplete' : 'Mark as complete'}
+          aria-label="Đánh dấu là đã hoàn thành"
         >
-          {todo.completed && <Check size={16} className="font-bold" />}
+          <Check
+            size={10}
+            strokeWidth={3}
+            className={`transition-all duration-400 ${
+              todo.completed || isTicking
+                ? "opacity-100 transform scale-100 rotate-0"
+                : "opacity-0 transform scale-0 -rotate-90"
+            }`}
+          />
         </button>
 
-        <div className="flex-1 ml-5">
-          <div className="flex items-center gap-3 mb-2">
-            <h3 className={`font-bold text-lg transition-all duration-200 ${
-              todo.completed 
-                ? 'text-gray-500 line-through' 
-                : 'text-gray-800'
-            }`}>
+        {/* Content */}
+        <div className="flex-1 min-w-1">
+          <div className="text-sm text-gray-800 break-words leading-5">
+            <span
+              className={`transition-all duration-300 ${
+                todo.completed ? "line-through text-gray-400" : ""
+              }`}
+            >
               {todo.title}
-            </h3>
-            
-            {todo.priority && (
-              <span className={`px-3 py-1 rounded-full text-xs font-bold ${getPriorityStyles(todo.priority)}`}>
-                {todo.priority === 'high' && '🔴 Ưu tiên cao'}
-                {todo.priority === 'medium' && '🟡 Trung bình'}
-                {todo.priority === 'low' && '🟢 Thấp'}
-              </span>
-            )}
+            </span>
           </div>
-          
+
           {todo.description && (
-            <p className={`text-sm leading-relaxed mb-4 transition-all duration-200 ${
-              todo.completed 
-                ? 'text-gray-400 line-through' 
-                : 'text-gray-600'
-            }`}>
+            <p
+              className={`text-xs mt-0.5 leading-4 break-words transition-all duration-300 ${
+                todo.completed ? "text-gray-300 line-through" : "text-gray-600"
+              }`}
+            >
               {todo.description}
             </p>
           )}
 
-          {/* Enhanced date display */}
-          <div className="flex flex-wrap gap-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg border border-blue-200 text-xs font-medium">
-              <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-              Tạo: {formatDate(todo.createdAt)}
+          {todo.deadlineAt && (
+            <div
+              className={`mt-1 flex items-center gap-1 text-[11px] transition-colors duration-200 ${
+                isOverdue ? "text-red-600" : "text-gray-400"
+              }`}
+            >
+              <Calendar size={12} />
+              <span>{formatDate(todo.deadlineAt)}</span>
             </div>
-            
-            {todo.deadlineAt && (
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-orange-50 text-orange-700 rounded-lg border border-orange-200 text-xs font-medium">
-                <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
-                Hạn: {formatDate(todo.deadlineAt)}
-              </div>
-            )}
-            
-            {todo.completed && todo.completedAt && (
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-green-50 text-green-700 rounded-lg border border-green-200 text-xs font-medium">
-                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                Hoàn thành: {formatDate(todo.completedAt)}
-              </div>
-            )}
-          </div>
+          )}
         </div>
 
-        <button
-          onClick={() => onDelete(todo.id)}
-          className="flex-shrink-0 p-2.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all duration-200 opacity-0 group-hover:opacity-100 hover:scale-110 shadow-sm hover:shadow-md"
-          aria-label="Delete todo"
-        >
-          <Trash2 size={18} />
-        </button>
+        {/* Enhanced Actions with smooth transitions */}
+        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-x-2 group-hover:translate-x-0">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <button aria-label="Xoá công việc" className="p-1 hover:bg-red-50 rounded transition-all duration-150 transform hover:scale-110">
+                <Trash2 
+                  size={14}
+                  className="text-gray-400 hover:text-red-500 transition-colors duration-150"
+                />
+              </button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Xóa công việc</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Bạn có chắc muốn xóa "{todo.title}" không?
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Hủy</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => onDelete(todo.id)}
+                  className="bg-red-600 hover:bg-red-700"
+                >
+                  Xóa
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       </div>
     </div>
   );
