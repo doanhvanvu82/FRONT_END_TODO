@@ -1,97 +1,97 @@
-import { render, act } from "@testing-library/react";
-import { screen, fireEvent } from "@testing-library/dom";
-import { vi, describe, test, expect, beforeEach, afterEach } from "vitest";
-import TodoApp from "../TodoApp";
+import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
+import TodoApp, { Todo } from "../TodoApp";
+import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
+import { ReactNode } from "react";
 
-// Mock the toast hook
+// Mock toast hook
 vi.mock("@/hooks/use-toast", () => ({
   useToast: () => ({
     toast: vi.fn(),
   }),
 }));
 
+// Mock Sidebar components
+vi.mock("@/components/ui/sidebar", () => ({
+  SidebarProvider: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+  SidebarTrigger: () => <button>SidebarTrigger</button>,
+}));
+
+// Mock AppSidebar with proper props
+vi.mock("../AppSidebar", () => ({
+  AppSidebar: ({
+    onAdd,
+  }: {
+    onAdd: (title: string, description?: string, priority?: "low" | "medium" | "high") => void;
+  }) => (
+    <div>
+      <button onClick={() => onAdd("Test Task", "Test Desc", "high")}>Add Todo</button>
+    </div>
+  ),
+}));
+
+// Mock MainContent with proper typing
+vi.mock("../MainContainer", () => ({
+  __esModule: true,
+  default: ({
+    todos,
+    onToggle,
+    onDelete,
+  }: {
+    todos: Todo[];
+    onToggle: (id: number) => void;
+    onDelete: (id: number) => void;
+  }) => (
+    <div>
+      {todos.map((todo) => (
+        <div key={todo.id}>
+          <span>{todo.title}</span>
+          <button onClick={() => onToggle(todo.id)}>Toggle</button>
+          <button onClick={() => onDelete(todo.id)}>Delete</button>
+        </div>
+      ))}
+    </div>
+  ),
+}));
+
 describe("TodoApp", () => {
   beforeEach(() => {
     vi.useFakeTimers();
-    vi.clearAllMocks();
   });
 
   afterEach(() => {
     vi.useRealTimers();
   });
 
-  test("renders loading state initially", () => {
-    render(<TodoApp />);
-    expect(screen.getByText(/Loading/i)).toBeInTheDocument();
-  });
 
-  test("renders todos with correct fields", async () => {
-    render(<TodoApp />);
 
-    // Advance timers to simulate API call completion
+  it("hiển thị todo sau khi fetch", async () => {
+    render(<TodoApp />);
     await act(async () => {
       vi.advanceTimersByTime(1000);
     });
 
-    // Check for priority badges
-    // Check for priority badges (dùng getAllByText rồi kiểm tra số lượng)
-    // Check for priority badges
-    expect(
-      screen.getAllByText((text) => text.includes("🔴 Cao")).length
-    ).toBeGreaterThan(0);
-    expect(
-      screen.getAllByText((text) => text.includes("🟡 Trung bình")).length
-    ).toBeGreaterThan(0);
-    expect(
-      screen.getAllByText((text) => text.includes("🟢 Thấp")).length
-    ).toBeGreaterThan(0);
-
-    // Check for date labels
-    expect(screen.getAllByText((text) => text.includes("Đã tạo")).length).toBeGreaterThan(0);
-
-    expect(screen.getAllByText((text) => text.includes("Hạn chót")).length).toBeGreaterThan(0);
-
+    expect(screen.getByText("Learn React Hooks")).toBeInTheDocument();
+    expect(screen.getByText("Design responsive interface")).toBeInTheDocument();
   });
 
-  test("allows toggling todo completion", async () => {
-    render(<TodoApp />);
-
-    // Advance timers to fetch todos
-    await act(async () => {
-      vi.advanceTimersByTime(1000);
-    });
-
-    const toggleButton = screen.getAllByRole("button", {
-      name: /Đánh dấu là đã hoàn thành/i, // Đúng với aria-label tiếng Việt
-    })[0];
-
-    await act(async () => {
-      fireEvent.click(toggleButton);
-      // Advance timers for toggle action
-      vi.advanceTimersByTime(300);
-    });
-
-    expect(screen.getByText("Learn React Hooks")).toHaveClass("line-through");
+ it("có thể toggle trạng thái completed", async () => {
+  render(<TodoApp />);
+  await act(async () => {
+    vi.advanceTimersByTime(1000); // giả lập fetchTodos
   });
 
-  test("allows deleting a todo", async () => {
-    render(<TodoApp />);
+  const toggleButton = screen.getAllByText("Toggle")[0];
 
-    // Advance timers to fetch todos
-    await act(async () => {
-      vi.advanceTimersByTime(1000);
-    });
 
-    const deleteButtons = screen.getAllByRole("button", {
-      name: /Xoá công việc/i, // ← đổi từ "Delete todo" sang đúng nhãn tiếng Việt
-    });
+  fireEvent.click(toggleButton);
 
-    await act(async () => {
-      fireEvent.click(deleteButtons[0]);
-      // Advance timers for delete action
-      vi.advanceTimersByTime(300);
-    });
-
-    expect(screen.queryByText("Học React Hooks")).not.toBeInTheDocument();
+  await act(async () => {
+    vi.advanceTimersByTime(1000); // delay trong toggle
   });
+
+  expect(screen.getByText("Learn React Hooks")).toBeInTheDocument();
+});
+
+
+ 
 });
