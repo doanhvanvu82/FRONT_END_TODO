@@ -6,7 +6,9 @@ import React from "react";
 
 // Mocks cho AlertDialog (nếu dùng từ @/components/ui/alert-dialog, bạn cần mock nhẹ)
 vi.mock("@/components/ui/alert-dialog", async () => {
-  const actual = await vi.importActual<any>("@/components/ui/alert-dialog");
+  const actual = await vi.importActual<typeof import("@/components/ui/alert-dialog")>(
+  "@/components/ui/alert-dialog"
+);
   return {
     ...actual,
     AlertDialog: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
