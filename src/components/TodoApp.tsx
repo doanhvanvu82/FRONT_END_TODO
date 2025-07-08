@@ -4,6 +4,10 @@ import TodoItem from "./TodoItem";
 import AddTodo from "./AddTodo";
 import LoadingSpinner from "./LoadingSpinner";
 import ErrorMessage from "./ErrorMessage";
+import { Dialog, DialogTrigger, DialogContent } from "./ui/dialog";
+import { Button } from "./ui/button";
+import { Plus } from "lucide-react";
+import { request } from "@/lib/utils";
 
 export interface Todo {
   id: number;
@@ -13,76 +17,36 @@ export interface Todo {
   createdAt?: string;
   completedAt?: string;
   deadlineAt?: string;
-  priority?: 'low' | 'medium' | 'high';
+  priority?: "low" | "medium" | "high";
 }
+
+const API_URL = "/";
 
 const TodoApp = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
+  const [open, setOpen] = useState(false);
 
-  // const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-
-  // Fetch todos from backend
   const fetchTodos = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-
-      // Simulate API call for now - replace with actual API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Mock data matching your format
-      const mockResponse = {
-        success: true,
-        data: [
-          {
-            id: 1,
-            title: "Học React Hooks",
-            description: "Tìm hiểu useState, useEffect, và custom hooks",
-            completed: false,
-            createdAt: "2024-07-04T12:00:00.000Z",
-            deadlineAt: "2024-07-06T18:00:00.000Z",
-            completedAt: null,
-            priority: "high"
-          },
-          {
-            id: 2,
-            title: "Viết unit test với Jest",
-            description: "Viết ít nhất 3 bài test cho component TodoList",
-            completed: true,
-            createdAt: "2024-07-03T08:30:00.000Z",
-            completedAt: "2024-07-04T10:15:00.000Z",
-            deadlineAt: "2024-07-04T12:00:00.000Z",
-            priority: "medium"
-          },
-          {
-            id: 3,
-            title: "Thiết kế giao diện responsive",
-            description: "Sử dụng Tailwind CSS để tạo layout responsive",
-            completed: false,
-            createdAt: "2024-07-02T14:20:00.000Z",
-            deadlineAt: "2024-07-08T17:00:00.000Z",
-            completedAt: null,
-            priority: "low"
-          }
-        ],
-        message: "Lấy danh sách to-do thành công"
-      };
-
-      setTodos(mockResponse.data.map(todo => ({
-        ...todo,
-        priority: todo.priority as 'low' | 'medium' | 'high'
-      })));
-      console.log("Todos fetched successfully:", mockResponse.data);
-    } catch (err) {
+      const todos = await request<Todo[]>(API_URL);
+      setTodos(
+        todos.map((todo) => ({
+          ...todo,
+          priority: todo.priority as "low" | "medium" | "high",
+        }))
+      );
+    } catch (err: any) {
       setError("Failed to fetch todos. Please try again.");
       console.error("Error fetching todos:", err);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to fetch todos. Please try again.",
+        description: err.message || "Failed to fetch todos. Please try again.",
       });
     } finally {
       setLoading(false);
@@ -90,96 +54,89 @@ const TodoApp = () => {
   }, [toast]);
 
   // Add new todo
-  const addTodo = async (title: string, description?: string) => {
+  const addTodo = async (
+    title: string,
+    description?: string,
+    priority?: "low" | "medium" | "high",
+    deadlineAt?: string
+  ) => {
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      const newTodo: Todo = {
-        id: Date.now(),
-        title,
-        description,
-        completed: false,
-        createdAt: new Date().toISOString(),
-      };
-
+      const newTodo = await request<Todo>(API_URL, {
+        method: "POST",
+        body: JSON.stringify({ title, description, priority, deadlineAt }),
+      });
       setTodos((prev) => [newTodo, ...prev]);
-      console.log("Todo added:", newTodo);
-
       toast({
         title: "Success",
         description: "Todo added successfully!",
       });
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error adding todo:", err);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to add todo. Please try again.",
+        description: err.message || "Failed to add todo. Please try again.",
       });
     }
   };
 
-  // Toggle todo completion
   const toggleTodo = async (id: number) => {
     try {
       const todoToUpdate = todos.find((todo) => todo.id === id);
       if (!todoToUpdate) return;
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 300));
-
-      const updatedTodo = {
-        ...todoToUpdate,
-        completed: !todoToUpdate.completed,
-        completedAt: !todoToUpdate.completed
-          ? new Date().toISOString()
-          : undefined,
-      };
-
+      const updatedTodo = await request<Todo>(`/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify({
+          ...todoToUpdate,
+          completed: !todoToUpdate.completed,
+          completedAt: !todoToUpdate.completed ? new Date().toISOString() : null,
+        }),
+      });
       setTodos((prev) =>
         prev.map((todo) => (todo.id === id ? updatedTodo : todo))
       );
-
-      console.log("Todo toggled:", id);
-
       toast({
         title: todoToUpdate.completed
           ? "Todo marked as incomplete"
           : "Todo completed!",
         description: todoToUpdate.completed ? "Keep going!" : "Great job! 🎉",
       });
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error toggling todo:", err);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to update todo. Please try again.",
+        description: err.message || "Failed to update todo. Please try again.",
       });
     }
   };
 
-  // Delete todo
   const deleteTodo = async (id: number) => {
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 300));
-
+      await request<null>(`/${id}`, { method: "DELETE" });
       setTodos((prev) => prev.filter((todo) => todo.id !== id));
-      console.log("Todo deleted:", id);
-
       toast({
         title: "Todo deleted",
         description: "Todo has been removed successfully.",
       });
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error deleting todo:", err);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to delete todo. Please try again.",
+        description: err.message || "Failed to delete todo. Please try again.",
       });
     }
+  };
+
+  const handleAddTodo = async (
+    title: string,
+    description?: string,
+    priority: "low" | "medium" | "high" = "medium",
+    deadlineAt?: string
+  ) => {
+    await addTodo(title, description, priority, deadlineAt);
+    setOpen(false);
   };
 
   useEffect(() => {
@@ -197,56 +154,76 @@ const TodoApp = () => {
   const completedCount = todos.filter((todo) => todo.completed).length;
   const totalCount = todos.length;
 
-  return (
-    <div className="max-w-2xl mx-auto">
-      <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-        <AddTodo onAdd={addTodo} />
-      </div>
+  const priorityOrder = { high: 0, medium: 1, low: 2 };
+  const sortedTodos = [...todos].sort((a, b) => {
+    // 1. Chưa hoàn thành lên trên
+    if (a.completed !== b.completed) return a.completed ? 1 : -1;
+    // 2. Ưu tiên (high > medium > low)
+    const pa = priorityOrder[a.priority || 'medium'] ?? 1;
+    const pb = priorityOrder[b.priority || 'medium'] ?? 1;
+    if (pa !== pb) return pa - pb;
+    // 3. Deadline gần nhất lên trên (nếu có)
+    if (a.deadlineAt && b.deadlineAt) {
+      const da = new Date(a.deadlineAt).getTime();
+      const db = new Date(b.deadlineAt).getTime();
+      if (da !== db) return da - db;
+    } else if (a.deadlineAt) {
+      return -1;
+    } else if (b.deadlineAt) {
+      return 1;
+    }
+    // 4. Còn lại theo id giảm dần
+    return b.id - a.id;
+  });
 
-      {totalCount > 0 && (
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-800">Your Tasks</h2>
-            <div className="text-sm text-gray-500">
-              {completedCount} of {totalCount} completed
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 py-8 px-4">
+      <div className="max-w-3xl mx-auto">
+   
+        {/* Add Todo Section */}
+        <div className="mb-8">
+          <AddTodo onAdd={addTodo} />
+        </div>
+
+        {/* Tasks Overview */}
+        {totalCount > 0 && (
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 p-6 mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                <span className="text-blue-500">My Tasks</span>
+              </h2>
+              <div className="text-right">
+                <div className="text-xl font-bold text-gray-800">{completedCount}/{totalCount}</div>
+                <div className="text-sm text-gray-500">completed</div>
+              </div>
+            </div>
+            <div className="space-y-2">
+              {sortedTodos.map((todo) => (
+                <TodoItem
+                  key={todo.id}
+                  todo={todo}
+                  onToggle={toggleTodo}
+                  onDelete={deleteTodo}
+                />
+              ))}
             </div>
           </div>
+        )}
 
-          <div className="w-full bg-gray-200 rounded-full h-2 mb-6">
-            <div
-              className="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full transition-all duration-500"
-              style={{
-                width: `${
-                  totalCount > 0 ? (completedCount / totalCount) * 100 : 0
-                }%`,
-              }}
-            ></div>
+        {/* Empty State */}
+        {totalCount === 0 && !loading && (
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 p-16 text-center">
+            <div className="text-8xl mb-6 opacity-50">📝</div>
+            <h3 className="text-2xl font-bold text-gray-700 mb-3">
+              Ready to be productive?
+            </h3>
+            <p className="text-gray-500 text-lg mb-6">
+              Create your first task and start organizing your life!
+            </p>
+            <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full mx-auto"></div>
           </div>
-
-          <div className="space-y-3">
-            {todos.map((todo) => (
-              <TodoItem
-                key={todo.id}
-                todo={todo}
-                onToggle={toggleTodo}
-                onDelete={deleteTodo}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {totalCount === 0 && !loading && (
-        <div className="bg-white rounded-xl shadow-lg p-12 text-center">
-          <div className="text-6xl mb-4">📝</div>
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">
-            No todos yet
-          </h3>
-          <p className="text-gray-500">
-            Add your first todo above to get started!
-          </p>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

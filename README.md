@@ -1,4 +1,3 @@
-
 # To-Do App Frontend
 
 A modern, responsive React frontend for the To-Do List application. Built with TypeScript, Tailwind CSS, and comprehensive testing.
@@ -226,3 +225,28 @@ The app uses Tailwind CSS for styling. Key customization points:
 ---
 
 Built with ❤️ using React and TypeScript
+
+# Hướng dẫn chạy dự án với Docker Compose
+
+## Yêu cầu
+- Docker
+- Docker Compose
+
+## Cách chạy
+
+1. Build và khởi động toàn bộ hệ thống:
+
+```bash
+docker-compose up --build
+```
+
+2. Truy cập ứng dụng:
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:4000
+
+## Lưu ý
+- Frontend sẽ tự động gọi API tới backend qua địa chỉ `http://backend:4000` nhờ biến môi trường `VITE_API_URL`.
+- Nếu muốn chạy frontend ngoài Docker, hãy tạo file `.env` trong thư mục gốc frontend với nội dung:
+  ```
+  VITE_API_URL=http://localhost:4000
+  ```
