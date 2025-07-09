@@ -77,27 +77,45 @@ const TodoApp = () => {
     priority: "low" | "medium" | "high" = "medium",
     deadline_at?: string
   ) => {
+    if (!token) return;
+    // Tạo todo tạm thời với id âm để tránh trùng id backend
+    const tempId = Date.now() * -1;
+    const optimisticTodo: Todo = {
+      id: tempId,
+      title,
+      description,
+      completed: false,
+      createdAt: new Date().toISOString(),
+      completedAt: undefined,
+      deadline_at,
+      priority,
+    };
+    setTodos((prev) => [optimisticTodo, ...prev]);
     try {
-      if (!token) throw new Error("Bạn chưa đăng nhập");
       const res = await apiAddTodo({ title, description, priority, deadline_at });
-      setTodos((prev) => [
-        {
-          id: res.id,
-          title: res.title,
-          description: res.description,
-          completed: res.completed,
-          createdAt: res.created_at,
-          completedAt: res.completed_at,
-          deadline_at: res.deadline_at,
-          priority: res.priority as "low" | "medium" | "high",
-        },
-        ...prev,
-      ]);
+      setTodos((prev) =>
+        prev.map((todo) =>
+          todo.id === tempId
+            ? {
+                id: res.id,
+                title: res.title,
+                description: res.description,
+                completed: res.completed,
+                createdAt: res.created_at,
+                completedAt: res.completed_at,
+                deadline_at: res.deadline_at,
+                priority: res.priority as "low" | "medium" | "high",
+              }
+            : todo
+        )
+      );
       toast({
         title: "Success",
         description: "Todo added successfully!",
       });
     } catch (err: unknown) {
+      // Rollback: xóa todo tạm thời
+      setTodos((prev) => prev.filter((todo) => todo.id !== tempId));
       toast({
         variant: "destructive",
         title: "Error",
@@ -107,12 +125,17 @@ const TodoApp = () => {
   };
 
   const toggleTodo = async (id: number) => {
+    if (!token) return;
+    const todoToUpdate = todos.find((todo) => todo.id === id);
+    if (!todoToUpdate) return;
+    // Optimistic update
+    setTodos((prev) =>
+      prev.map((todo) =>
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo
+      )
+    );
     try {
-      if (!token) throw new Error("Bạn chưa đăng nhập");
-      const todoToUpdate = todos.find((todo) => todo.id === id);
-      if (!todoToUpdate) return;
       const res = await apiUpdateTodo(id, { completed: !todoToUpdate.completed });
-      // res là 1 todo object
       setTodos((prev) =>
         prev.map((todo) =>
           todo.id === id
@@ -138,6 +161,12 @@ const TodoApp = () => {
           : "Xuất sắc! 🎉",
       });
     } catch (err: unknown) {
+      // Rollback
+      setTodos((prev) =>
+        prev.map((todo) =>
+          todo.id === id ? { ...todo, completed: todoToUpdate.completed } : todo
+        )
+      );
       toast({
         variant: "destructive",
         title: "Lỗi",
@@ -147,16 +176,20 @@ const TodoApp = () => {
   };
 
   const deleteTodo = async (id: number) => {
+    if (!token) return;
+    const prevTodos = todos;
+    // Optimistic update
+    setTodos((prev) => prev.filter((todo) => todo.id !== id));
     try {
-      if (!token) throw new Error("Bạn chưa đăng nhập");
       const res = await apiDeleteTodo(id);
       if (!res.success) throw new Error(res.message || "Lỗi xoá todo");
-      setTodos((prev) => prev.filter((todo) => todo.id !== id));
       toast({
         title: "Đã xoá công việc",
         description: "Công việc đã được xoá thành công.",
       });
     } catch (err: unknown) {
+      // Rollback
+      setTodos(prevTodos);
       toast({
         variant: "destructive",
         title: "Lỗi",
@@ -168,10 +201,6 @@ const TodoApp = () => {
   useEffect(() => {
     fetchTodos();
   }, [fetchTodos]);
-
-  if (loading && todos.length === 0) {
-    return <LoadingSpinner />;
-  }
 
   if (error && todos.length === 0) {
     return <ErrorMessage message={error} onRetry={fetchTodos} />;
@@ -225,6 +254,7 @@ const TodoApp = () => {
             onToggle={toggleTodo}
             onDelete={deleteTodo}
             onAdd={addTodo}
+            loading={loading}
           />
         </div>
       </div>

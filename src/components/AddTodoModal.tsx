@@ -149,7 +149,7 @@ const AddTodoModal = ({ isOpen, onClose, onAdd }: AddTodoModalProps) => {
             />
             <div className="flex gap-2 mt-2">
               <Button type="button" variant="secondary" onClick={handleAISuggest} disabled={aiLoading || !title.trim()}>
-                {aiLoading ? "Suggesting..." : "Add with AI"}
+                {aiLoading ? "Suggesting..." : "Suggest with AI"}
               </Button>
             </div>
             {aiError && <div className="text-red-500 text-xs mt-1">{aiError}</div>}

@@ -65,6 +65,15 @@ const AuthModal = ({ open, onClose }: AuthModalProps) => {
     }
   };
 
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+    if (remember) setRemember(false);
+  };
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+    if (remember) setRemember(false);
+  };
+
   if (open) {
     document.body.style.background = "#f6f9fb";
   } else {
@@ -110,7 +119,7 @@ const AuthModal = ({ open, onClose }: AuthModalProps) => {
               type="email"
               placeholder="Email address"
               value={email}
-              onChange={e => setEmail(e.target.value)}
+              onChange={handleEmailChange}
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-400"
             />
@@ -122,7 +131,7 @@ const AuthModal = ({ open, onClose }: AuthModalProps) => {
               type="password"
               placeholder="Password"
               value={password}
-              onChange={e => setPassword(e.target.value)}
+              onChange={handlePasswordChange}
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-400"
             />

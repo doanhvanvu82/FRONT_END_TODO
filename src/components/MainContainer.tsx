@@ -5,6 +5,7 @@ import TodoItem from "./TodoItem";
 import InlineAddTask from "./InlineAddTask";
 import { Button } from "@/components/ui/button";
 import React from "react";
+import { TodoItemSkeleton } from "./TodoItem";
 
 interface MainContentProps {
   currentSection: string;
@@ -17,6 +18,7 @@ interface MainContentProps {
     priority?: "low" | "medium" | "high",
     deadline_at?: string
   ) => void;
+  loading: boolean;
 }
 
 const MainContent = ({
@@ -25,6 +27,7 @@ const MainContent = ({
   onToggle,
   onDelete,
   onAdd,
+  loading,
 }: MainContentProps) => {
   const [showInlineAdd, setShowInlineAdd] = useState(false);
   // Xóa toàn bộ state và logic liên quan đến pendingRemove, handleToggle, removeTimeouts
@@ -128,90 +131,89 @@ const MainContent = ({
 
       {/* Content */}
       <div className="px-40 pb-40">
-      {filteredTodos.length === 0 ? (
-        currentSection === "inbox" ? (
-          showInlineAdd ? (
-            <InlineAddTask
-              onAdd={handleInlineAdd}
-              onCancel={() => setShowInlineAdd(false)}
-            />
+        {loading && currentSection === "inbox" && todos.length === 0 ? (
+          <div>
+            {[...Array(5)].map((_, i) => (
+              <TodoItemSkeleton key={i} />
+            ))}
+          </div>
+        ) : filteredTodos.length === 0 ? (
+          currentSection === "inbox" ? (
+            showInlineAdd ? (
+              <InlineAddTask
+                onAdd={handleInlineAdd}
+                onCancel={() => setShowInlineAdd(false)}
+              />
+            ) : (
+              <div className="text-center py-16">
+                {/* Giao diện minh họa */}
+                <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-yellow-200 via-yellow-300 to-yellow-400 rounded-2xl flex items-center justify-center">
+                  <div className="w-16 h-12 bg-yellow-500 rounded-lg relative">
+                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-600 rounded-full"></div>
+                    <div className="absolute -top-2 -left-2 w-3 h-6 bg-green-400 rounded-full transform rotate-12"></div>
+                    <div className="absolute -bottom-2 -right-2 w-3 h-6 bg-green-400 rounded-full transform -rotate-12"></div>
+                    <div className="absolute -top-1 right-4 w-2 h-2 bg-yellow-300 rounded-full"></div>
+                    <div className="absolute -bottom-1 left-2 w-2 h-2 bg-yellow-300 rounded-full"></div>
+                  </div>
+                </div>
+
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Capture now, plan later
+                </h3>
+                <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                  {getSectionDescription()}
+                </p>
+
+                <Button
+                  onClick={() => setShowInlineAdd(true)}
+                  className="bg-red-500 hover:bg-red-600 text-white"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add task
+                </Button>
+              </div>
+            )
           ) : (
             <div className="text-center py-16">
-              {/* Giao diện minh họa */}
-              <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-yellow-200 via-yellow-300 to-yellow-400 rounded-2xl flex items-center justify-center">
-                <div className="w-16 h-12 bg-yellow-500 rounded-lg relative">
-                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-600 rounded-full"></div>
-                  <div className="absolute -top-2 -left-2 w-3 h-6 bg-green-400 rounded-full transform rotate-12"></div>
-                  <div className="absolute -bottom-2 -right-2 w-3 h-6 bg-green-400 rounded-full transform -rotate-12"></div>
-                  <div className="absolute -top-1 right-4 w-2 h-2 bg-yellow-300 rounded-full"></div>
-                  <div className="absolute -bottom-1 left-2 w-2 h-2 bg-yellow-300 rounded-full"></div>
-                </div>
-              </div>
-
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Capture now, plan later
+                {currentSection === "completed"
+                  ? "No completed tasks yet"
+                  : "No tasks in this section"}
               </h3>
               <p className="text-gray-600 mb-6 max-w-md mx-auto">
-                {getSectionDescription()}
+                {currentSection === "completed"
+                  ? "Complete some tasks to see them here."
+                  : getSectionDescription()}
               </p>
-
-              <Button
-                onClick={() => setShowInlineAdd(true)}
-                className="bg-red-500 hover:bg-red-600 text-white"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Add task
-              </Button>
             </div>
           )
         ) : (
-          <div className="text-center py-16">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              {currentSection === "completed"
-                ? "No completed tasks yet"
-                : "No tasks in this section"}
-            </h3>
-            <p className="text-gray-600 mb-6 max-w-md mx-auto">
-              {currentSection === "completed"
-                ? "Complete some tasks to see them here."
-                : getSectionDescription()}
-            </p>
-          </div>
-        )
-      ) : (
-        <div>
-          {filteredTodos.map((todo) => (
-            <TodoItem
-              key={todo.id}
-              todo={todo}
-              onToggle={onToggle}
-              onDelete={onDelete}
-            />
-          ))}
+          <div>
+            {filteredTodos.map((todo) => (
+              <TodoItem
+                key={todo.id}
+                todo={todo}
+                onToggle={onToggle}
+                onDelete={onDelete}
+              />
+            ))}
 
-          {currentSection === "inbox" && (showInlineAdd ? (
-            <InlineAddTask
-              onAdd={handleInlineAdd}
-              onCancel={() => setShowInlineAdd(false)}
-            />
-          ) : (
-            <button
-              onClick={() => setShowInlineAdd(true)}
-              className="group w-full text-left px-4 py-3 text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-3"
-            >
-              <div
-                className="w-5 h-5 flex items-center justify-center rounded-full transition-all group-hover:bg-red-500"
+            {currentSection === "inbox" && (showInlineAdd ? (
+              <InlineAddTask
+                onAdd={handleInlineAdd}
+                onCancel={() => setShowInlineAdd(false)}
+              />
+            ) : (
+              <button
+                onClick={() => setShowInlineAdd(true)}
+                className="group w-full text-left px-4 py-3 text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-3"
               >
-                <Plus
-                  className="w-6 h-6 text-red-600 transition-all group-hover:text-white"
-                  strokeWidth={1}
-                />
-              </div>
-              <span className="text-sm">Add task</span>
-            </button>
-          ))}
-        </div>
-      )}
+                <Plus className="w-4 h-4 mr-2" />
+                Add task
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
