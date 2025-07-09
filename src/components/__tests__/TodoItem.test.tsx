@@ -32,7 +32,7 @@ describe("TodoItem", () => {
     description: "Test description",
     completed: false,
     createdAt: new Date().toISOString(),
-    deadlineAt: new Date(Date.now() + 86400000).toISOString(), // tomorrow
+    deadline_at: new Date(Date.now() + 86400000).toISOString(), // tomorrow
     priority: "medium",
   };
 

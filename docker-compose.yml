@@ -1,31 +1,27 @@
 version: '3.8'
 
 services:
+  backend:
+    image: ghcr.io/dangdat204/to-do-app:latest
+    container_name: task-app-backend
+    restart: always
+    ports:
+      - "4000:4000"
+    networks:
+      - app-network
+
   frontend:
-    build: .
+    build:
+      context: .
+    container_name: task-app-frontend
+    restart: always
     ports:
       - "3000:3000"
-    environment:
-      - REACT_APP_API_URL=http://backend:5000/api
     depends_on:
       - backend
     networks:
-      - todo-network
-
-  backend:
-    # This would be your Express backend
-    # build: ./backend
-    image: todo-backend:latest
-    ports:
-      - "5000:5000"
-    environment:
-      - NODE_ENV=production
-    networks:
-      - todo-network
+      - app-network
 
 networks:
-  todo-network:
+  app-network:
     driver: bridge
-
-volumes:
-  mongo-data:

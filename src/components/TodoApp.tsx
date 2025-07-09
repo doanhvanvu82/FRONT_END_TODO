@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { SidebarProvider } from "@/components/ui/sidebar";
@@ -7,6 +6,8 @@ import MainContent from "./MainContainer";
 import LoadingSpinner from "./LoadingSpinner";
 import ErrorMessage from "./ErrorMessage";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { getTodos as apiGetTodos, addTodo as apiAddTodo, updateTodo as apiUpdateTodo, deleteTodo as apiDeleteTodo } from "@/lib/api";
+import { useAuth } from "@/hooks/use-auth";
 
 export interface Todo {
   id: number;
@@ -15,7 +16,7 @@ export interface Todo {
   completed: boolean;
   createdAt?: string;
   completedAt?: string;
-  deadlineAt?: string;
+  deadline_at?: string;
   priority?: "low" | "medium" | "high";
 }
 
@@ -25,152 +26,97 @@ const TodoApp = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentSection, setCurrentSection] = useState("inbox");
   const { toast } = useToast();
+  const { token } = useAuth();
 
   const fetchTodos = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      const mockResponse = {
-        success: true,
-        data: [
-          {
-            id: 1,
-            title: "Learn React Hooks",
-            description: "Study useState, useEffect, and custom hooks",
-            completed: false,
-            createdAt: "2024-07-04T12:00:00.000Z",
-            deadlineAt: "2024-07-07T18:00:00.000Z",
-            completedAt: null,
-            priority: "high",
-          },
-          {
-            id: 2,
-            title: "Write unit tests with Jest",
-            description: "Write at least 3 tests for TodoList component",
-            completed: true,
-            createdAt: "2024-07-03T08:30:00.000Z",
-            completedAt: "2024-07-04T10:15:00.000Z",
-            deadlineAt: "2024-07-04T12:00:00.000Z",
-            priority: "medium",
-          },
-          {
-            id: 3,
-            title: "Design responsive interface",
-            description: "Use Tailwind CSS to create responsive layout",
-            completed: false,
-            createdAt: "2024-07-02T14:20:00.000Z",
-            deadlineAt: "2024-07-08T17:00:00.000Z",
-            completedAt: null,
-            priority: "low",
-          },
-          {
-            id: 4,
-            title: "Set up CI/CD pipeline",
-            completed: false,
-            createdAt: "2024-07-05T09:00:00.000Z",
-            priority: "medium",
-          },
-          {
-            id: 5,
-            title: "Review pull requests",
-            description: "Check and approve pending PRs from team members",
-            completed: false,
-            createdAt: "2024-07-05T14:30:00.000Z",
-            deadlineAt: "2024-07-07T17:00:00.000Z",
-            priority: "high",
-          },
-          {
-            id: 6,
-            title: "Update documentation",
-            completed: true,
-            createdAt: "2024-07-04T16:00:00.000Z",
-            completedAt: "2024-07-05T11:30:00.000Z",
-            priority: "low",
-          },
-        ],
-        message: "Todo list fetched successfully",
-      };
-
+      if (!token) throw new Error("Bạn chưa đăng nhập");
+      const res = await apiGetTodos();
+      if (!Array.isArray(res)) throw new Error("Lỗi lấy todo");
       setTodos(
-        mockResponse.data.map((todo) => ({
-          ...todo,
+        res.map((todo: any) => ({
+          id: todo.id,
+          title: todo.title,
+          description: todo.description,
+          completed: todo.completed,
+          createdAt: todo.created_at,
+          completedAt: todo.completed_at,
+          deadline_at: todo.deadline_at,
           priority: todo.priority as "low" | "medium" | "high",
         }))
       );
-      console.log("Todos fetched successfully:", mockResponse.data);
-    } catch (err) {
-      setError("Failed to fetch todos. Please try again.");
-      console.error("Error fetching todos:", err);
+    } catch (err: any) {
+      setError(err.message || "Failed to fetch todos. Please try again.");
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to fetch todos. Please try again.",
+        description: err.message || "Failed to fetch todos. Please try again.",
       });
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, token]);
 
   const addTodo = async (
     title: string,
     description?: string,
     priority: "low" | "medium" | "high" = "medium",
-    deadlineAt?: string
+    deadline_at?: string
   ) => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      const newTodo: Todo = {
-        id: Date.now(),
-        title,
-        description,
-        completed: false,
-        createdAt: new Date().toISOString(),
-        priority,
-        deadlineAt,
-      };
-
-      setTodos((prev) => [newTodo, ...prev]);
-      console.log("Todo added:", newTodo);
-
+      if (!token) throw new Error("Bạn chưa đăng nhập");
+      const res = await apiAddTodo({ title, description, priority, deadline_at });
+      setTodos((prev) => [
+        {
+          id: res.id,
+          title: res.title,
+          description: res.description,
+          completed: res.completed,
+          createdAt: res.created_at,
+          completedAt: res.completed_at,
+          deadline_at: res.deadline_at,
+          priority: res.priority as "low" | "medium" | "high",
+        },
+        ...prev,
+      ]);
       toast({
         title: "Success",
         description: "Todo added successfully!",
       });
-    } catch (err) {
-      console.error("Error adding todo:", err);
+    } catch (err: any) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to add todo. Please try again.",
+        description: err.message || "Failed to add todo. Please try again.",
       });
     }
   };
 
   const toggleTodo = async (id: number) => {
     try {
+      if (!token) throw new Error("Bạn chưa đăng nhập");
       const todoToUpdate = todos.find((todo) => todo.id === id);
       if (!todoToUpdate) return;
-
-      await new Promise((resolve) => setTimeout(resolve, 300));
-
-      const updatedTodo = {
-        ...todoToUpdate,
-        completed: !todoToUpdate.completed,
-        completedAt: !todoToUpdate.completed
-          ? new Date().toISOString()
-          : undefined,
-      };
-
+      const res = await apiUpdateTodo(id, { completed: !todoToUpdate.completed });
+      // res là 1 todo object
       setTodos((prev) =>
-        prev.map((todo) => (todo.id === id ? updatedTodo : todo))
+        prev.map((todo) =>
+          todo.id === id
+            ? {
+                id: res.id,
+                title: res.title,
+                description: res.description,
+                completed: res.completed,
+                createdAt: res.created_at,
+                completedAt: res.completed_at,
+                deadline_at: res.deadline_at,
+                priority: res.priority as "low" | "medium" | "high",
+              }
+            : todo
+        )
       );
-
-      console.log("Đã cập nhật trạng thái công việc:", id);
-
       toast({
         title: todoToUpdate.completed
           ? "Đã đánh dấu là chưa hoàn thành"
@@ -179,33 +125,30 @@ const TodoApp = () => {
           ? "Tiếp tục cố gắng nhé!"
           : "Xuất sắc! 🎉",
       });
-    } catch (err) {
-      console.error("Lỗi khi cập nhật công việc:", err);
+    } catch (err: any) {
       toast({
         variant: "destructive",
         title: "Lỗi",
-        description: "Không thể cập nhật công việc. Vui lòng thử lại.",
+        description: err.message || "Không thể cập nhật công việc. Vui lòng thử lại.",
       });
     }
   };
 
   const deleteTodo = async (id: number) => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 300));
-
+      if (!token) throw new Error("Bạn chưa đăng nhập");
+      const res = await apiDeleteTodo(id);
+      if (!res.success) throw new Error(res.message || "Lỗi xoá todo");
       setTodos((prev) => prev.filter((todo) => todo.id !== id));
-      console.log("Đã xoá công việc:", id);
-
       toast({
         title: "Đã xoá công việc",
         description: "Công việc đã được xoá thành công.",
       });
-    } catch (err) {
-      console.error("Lỗi khi xoá công việc:", err);
+    } catch (err: any) {
       toast({
         variant: "destructive",
         title: "Lỗi",
-        description: "Không thể xoá công việc. Vui lòng thử lại.",
+        description: err.message || "Không thể xoá công việc. Vui lòng thử lại.",
       });
     }
   };
@@ -231,21 +174,21 @@ const TodoApp = () => {
   const todoCounts = {
     inbox: todos.filter((todo) => !todo.completed).length,
     overdue: todos.filter((todo) => {
-      if (todo.completed || !todo.deadlineAt) return false;
-      const deadline = new Date(todo.deadlineAt);
+      if (todo.completed || !todo.deadline_at) return false;
+      const deadline = new Date(todo.deadline_at);
       return deadline < today;
     }).length,
     today: todos.filter((todo) => {
-      if (todo.completed || !todo.deadlineAt) return false;
-      const deadline = new Date(todo.deadlineAt);
+      if (todo.completed || !todo.deadline_at) return false;
+      const deadline = new Date(todo.deadline_at);
       return deadline >= today && deadline < tomorrow;
     }).length,
     upcoming: todos.filter((todo) => {
-      if (todo.completed || !todo.deadlineAt) return false;
-      const deadline = new Date(todo.deadlineAt);
+      if (todo.completed || !todo.deadline_at) return false;
+      const deadline = new Date(todo.deadline_at);
       return deadline >= tomorrow;
     }).length,
-    noDeadline: todos.filter((todo) => !todo.completed && !todo.deadlineAt)
+    noDeadline: todos.filter((todo) => !todo.completed && !todo.deadline_at)
       .length,
     completed: todos.filter((todo) => todo.completed).length,
   };

@@ -22,7 +22,11 @@ import {
   MoreHorizontal,
   ChevronLeft,
   ChevronRight,
+  Calendar as CalendarIcon,
 } from "lucide-react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { forwardRef } from "react";
 
 
 interface AddTodoModalProps {
@@ -32,7 +36,7 @@ interface AddTodoModalProps {
     title: string,
     description?: string,
         priority?: "low" | "medium" | "high" | "none", 
-    deadlineAt?: string
+    deadline_at?: string
   ) => void;
 }
 
@@ -50,7 +54,7 @@ const AddTodoModal = ({ isOpen, onClose, onAdd }: AddTodoModalProps) => {
       onAdd(
         title.trim(),
         description.trim() || undefined,
-        priority,
+        priority === "none" ? null : priority,
         deadline || undefined
       );
       setTitle("");
@@ -60,6 +64,21 @@ const AddTodoModal = ({ isOpen, onClose, onAdd }: AddTodoModalProps) => {
       onClose();
     }
   };
+
+  const CustomDateInput = forwardRef<HTMLButtonElement, { value?: string; onClick?: () => void }>(
+    ({ value, onClick }, ref) => (
+      <button
+        type="button"
+        onClick={onClick}
+        ref={ref}
+        className="flex items-center h-[1.625rem] px-2 text-xs border border-gray-200 rounded text-gray-600 bg-white hover:bg-gray-50"
+      >
+        <CalendarIcon className="w-4 h-4 mr-1 text-gray-500" />
+        <span>{value || "Date"}</span>
+      </button>
+    )
+  );
+  CustomDateInput.displayName = "CustomDateInput";
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -158,12 +177,16 @@ const AddTodoModal = ({ isOpen, onClose, onAdd }: AddTodoModalProps) => {
 
           <div>
             <Label htmlFor="deadline">Due date</Label>
-            <Input
-              id="deadline"
-              type="datetime-local"
-              value={deadline}
-              onChange={(e) => setDeadline(e.target.value)}
-              className="focus:outline-none focus:ring-0 focus-visible:ring-0"
+            <DatePicker
+              selected={deadline ? new Date(deadline) : null}
+              onChange={(date: Date | null) => {
+                if (date) setDeadline(date.toISOString());
+              }}
+              showTimeSelect
+              timeFormat="HH:mm"
+              timeIntervals={15}
+              dateFormat="Pp"
+              customInput={<CustomDateInput />}
             />
           </div>
 
