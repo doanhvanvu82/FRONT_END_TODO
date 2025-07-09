@@ -14,7 +14,7 @@ interface MainContentProps {
     title: string,
     description?: string,
     priority?: "low" | "medium" | "high",
-    deadlineAt?: string
+    deadline_at?: string
   ) => void;
 }
 
@@ -74,24 +74,24 @@ const MainContent = ({
     switch (currentSection) {
       case "today":
         return todos.filter((todo) => {
-          if (todo.completed || !todo.deadlineAt) return false;
-          const deadline = new Date(todo.deadlineAt);
+          if (todo.completed || !todo.deadline_at) return false;
+          const deadline = new Date(todo.deadline_at);
           return deadline >= today && deadline < tomorrow;
         });
       case "upcoming":
         return todos.filter((todo) => {
-          if (todo.completed || !todo.deadlineAt) return false;
-          const deadline = new Date(todo.deadlineAt);
+          if (todo.completed || !todo.deadline_at) return false;
+          const deadline = new Date(todo.deadline_at);
           return deadline >= tomorrow;
         });
       case "overdue":
         return todos.filter((todo) => {
-          if (todo.completed || !todo.deadlineAt) return false;
-          const deadline = new Date(todo.deadlineAt);
+          if (todo.completed || !todo.deadline_at) return false;
+          const deadline = new Date(todo.deadline_at);
           return deadline < today;
         });
       case "nodeadline":
-        return todos.filter((todo) => !todo.completed && !todo.deadlineAt);
+        return todos.filter((todo) => !todo.completed && !todo.deadline_at);
       case "completed":
         return todos.filter((todo) => todo.completed);
       case "inbox":
@@ -105,9 +105,9 @@ const MainContent = ({
     title: string,
     description?: string,
     priority?: "low" | "medium" | "high",
-    deadlineAt?: string
+    deadline_at?: string
   ) => {
-    onAdd(title, description, priority, deadlineAt);
+    onAdd(title, description, priority, deadline_at);
   };
 
   return (

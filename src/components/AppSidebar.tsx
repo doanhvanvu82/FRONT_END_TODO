@@ -9,6 +9,7 @@ import {
   User,
   AlertCircle,
   HelpCircle,
+  LogOut,
 } from "lucide-react";
 import {
   Sidebar,
@@ -23,6 +24,7 @@ import {
 } from "@/components/ui/sidebar";
 import AddTodoModal from "./AddTodoModal";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { useAuth } from "@/hooks/use-auth";
 
 interface AppSidebarProps {
   onSectionChange: (section: string) => void;
@@ -39,7 +41,7 @@ interface AppSidebarProps {
     title: string,
     description?: string,
     priority?: "low" | "medium" | "high",
-    deadlineAt?: string
+    deadline_at?: string
   ) => void;
 }
 
@@ -51,6 +53,7 @@ export function AppSidebar({
 }: AppSidebarProps) {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const { state } = useSidebar();
+  const { logout, user } = useAuth();
 
   const mainItems = [
     {
@@ -112,7 +115,7 @@ export function AppSidebar({
             <User className="w-4 h-4 text-white" />
           </div>
           {!isCollapsed && (
-            <span className="font-medium text-gray-900">hungnghiemquoc</span>
+            <span className="font-medium text-gray-900">{user?.user_metadata?.username || user?.username || 'User'}</span>
           )}
         </div>
 
@@ -196,6 +199,25 @@ export function AppSidebar({
         onClose={() => setIsAddModalOpen(false)}
         onAdd={onAdd}
       />
+
+      {/* Nút Đăng xuất ở cuối sidebar */}
+      <div className="mt-auto mb-4 px-2">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              className="w-full justify-start rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            >
+              <button onClick={logout}>
+                <div className="flex items-center gap-3">
+                  <LogOut className="w-5 h-5 text-gray-500" />
+                  {!isCollapsed && <span>Đăng xuất</span>}
+                </div>
+              </button>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </div>
     </Sidebar>
   );
 }

@@ -48,7 +48,9 @@ const TodoItem = ({ todo, onToggle, onDelete }: TodoItemProps) => {
   const [isTicking, setIsTicking] = useState(false);
   const formatDate = (dateString?: string) => {
     if (!dateString) return "";
-    const date = new Date(dateString);
+    const date = new Date(
+      dateString.length === 19 ? dateString + "Z" : dateString
+    );
     const now = new Date();
 
     const isSameDay = (d1: Date, d2: Date) =>
@@ -107,8 +109,8 @@ const TodoItem = ({ todo, onToggle, onDelete }: TodoItemProps) => {
   };
 
   const isOverdue =
-    todo.deadlineAt &&
-    new Date(todo.deadlineAt) < new Date() &&
+    todo.deadline_at &&
+    new Date(todo.deadline_at) < new Date() &&
     !todo.completed;
 
   return (
@@ -171,14 +173,14 @@ const TodoItem = ({ todo, onToggle, onDelete }: TodoItemProps) => {
             </p>
           )}
 
-          {todo.deadlineAt && (
+          {todo.deadline_at && (
             <div
               className={`mt-1 flex items-center gap-1 text-[11px] transition-colors duration-200 ${
                 isOverdue ? "text-red-600" : "text-gray-400"
               }`}
             >
               <Calendar size={12} />
-              <span>{formatDate(todo.deadlineAt)}</span>
+              <span>{formatDate(todo.deadline_at)}</span>
             </div>
           )}
         </div>

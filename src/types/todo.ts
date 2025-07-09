@@ -5,6 +5,6 @@ export interface Todo {
   completed: boolean;
   priority?: 'high' | 'medium' | 'low';
   createdAt?: string;
-  deadlineAt?: string;
+  deadline_at?: string;
   completedAt?: string;
 }

@@ -46,7 +46,7 @@ interface InlineAddTaskProps {
     title: string,
     description?: string,
     priority?: "low" | "medium" | "high" | "none", 
-    deadlineAt?: string
+    deadline_at?: string
   ) => void;
   onCancel: () => void;
 }
@@ -101,7 +101,7 @@ const InlineAddTask = ({ onAdd, onCancel }: InlineAddTaskProps) => {
       onAdd(
         title.trim(),
         description.trim() || undefined,
-        priority,
+        priority === "none" ? null : priority,
         deadline || undefined
       );
       setTitle("");
