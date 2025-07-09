@@ -129,13 +129,12 @@ const MainContent = ({
       {/* Content */}
       <div className="px-40 pb-40">
       {filteredTodos.length === 0 ? (
+        currentSection === "inbox" ? (
           showInlineAdd ? (
-           
-              <InlineAddTask
-                onAdd={handleInlineAdd}
-                onCancel={() => setShowInlineAdd(false)}
-              />
-           
+            <InlineAddTask
+              onAdd={handleInlineAdd}
+              onCancel={() => setShowInlineAdd(false)}
+            />
           ) : (
             <div className="text-center py-16">
               {/* Giao diện minh họa */}
@@ -150,64 +149,69 @@ const MainContent = ({
               </div>
 
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                {currentSection === "completed"
-                  ? "No completed tasks yet"
-                  : "Capture now, plan later"}
+                Capture now, plan later
               </h3>
               <p className="text-gray-600 mb-6 max-w-md mx-auto">
-                {currentSection === "completed"
-                  ? "Complete some tasks to see them here."
-                  : getSectionDescription()}
+                {getSectionDescription()}
               </p>
 
-              {currentSection !== "completed" && (
-                <Button
-                  onClick={() => setShowInlineAdd(true)}
-                  className="bg-red-500 hover:bg-red-600 text-white"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add task
-                </Button>
-              )}
+              <Button
+                onClick={() => setShowInlineAdd(true)}
+                className="bg-red-500 hover:bg-red-600 text-white"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Add task
+              </Button>
             </div>
           )
         ) : (
-          <div>
-            {filteredTodos.map((todo) => (
-              <TodoItem
-                key={todo.id}
-                todo={todo}
-                onToggle={onToggle}
-                onDelete={onDelete}
-              />
-            ))}
-
-            {showInlineAdd ? (
-              <InlineAddTask
-                onAdd={handleInlineAdd}
-                onCancel={() => setShowInlineAdd(false)}
-              />
-            ) : (
-              currentSection !== "completed" && (
-                <button
-                  onClick={() => setShowInlineAdd(true)}
-                  className="group w-full text-left px-4 py-3 text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-3"
-                >
-                  <div
-                    className="w-5 h-5 flex items-center justify-center rounded-full transition-all
-               group-hover:bg-red-500"
-                  >
-                    <Plus
-                      className="w-6 h-6 text-red-600 transition-all group-hover:text-white"
-                      strokeWidth={1}
-                    />
-                  </div>
-                  <span className="text-sm">Add task</span>
-                </button>
-              )
-            )}
+          <div className="text-center py-16">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              {currentSection === "completed"
+                ? "No completed tasks yet"
+                : "No tasks in this section"}
+            </h3>
+            <p className="text-gray-600 mb-6 max-w-md mx-auto">
+              {currentSection === "completed"
+                ? "Complete some tasks to see them here."
+                : getSectionDescription()}
+            </p>
           </div>
-        )}
+        )
+      ) : (
+        <div>
+          {filteredTodos.map((todo) => (
+            <TodoItem
+              key={todo.id}
+              todo={todo}
+              onToggle={onToggle}
+              onDelete={onDelete}
+            />
+          ))}
+
+          {currentSection === "inbox" && (showInlineAdd ? (
+            <InlineAddTask
+              onAdd={handleInlineAdd}
+              onCancel={() => setShowInlineAdd(false)}
+            />
+          ) : (
+            <button
+              onClick={() => setShowInlineAdd(true)}
+              className="group w-full text-left px-4 py-3 text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-3"
+            >
+              <div
+                className="w-5 h-5 flex items-center justify-center rounded-full transition-all group-hover:bg-red-500"
+              >
+                <Plus
+                  className="w-6 h-6 text-red-600 transition-all group-hover:text-white"
+                  strokeWidth={1}
+                />
+              </div>
+              <span className="text-sm">Add task</span>
+            </button>
+          ))}
+        </div>
+      )}
       </div>
     </div>
   );

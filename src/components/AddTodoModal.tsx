@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -120,6 +120,16 @@ const AddTodoModal = ({ isOpen, onClose, onAdd }: AddTodoModalProps) => {
   ));
   CustomDateInput.displayName = "CustomDateInput";
 
+  const descriptionRef = useRef<HTMLTextAreaElement>(null);
+
+  // Auto-resize description textarea when value changes
+  useEffect(() => {
+    if (descriptionRef.current) {
+      descriptionRef.current.style.height = "auto";
+      descriptionRef.current.style.height = descriptionRef.current.scrollHeight + "px";
+    }
+  }, [description]);
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
@@ -137,11 +147,11 @@ const AddTodoModal = ({ isOpen, onClose, onAdd }: AddTodoModalProps) => {
               className="focus:outline-none focus:ring-0 focus-visible:ring-0"
               required
             />
-            {/* <div className="flex gap-2 mt-2">
+            <div className="flex gap-2 mt-2">
               <Button type="button" variant="secondary" onClick={handleAISuggest} disabled={aiLoading || !title.trim()}>
                 {aiLoading ? "Suggesting..." : "Add with AI"}
               </Button>
-            </div> */}
+            </div>
             {aiError && <div className="text-red-500 text-xs mt-1">{aiError}</div>}
             {aiSuggestions && (
               <div className="border rounded p-2 mt-2 bg-gray-50">
@@ -173,8 +183,9 @@ const AddTodoModal = ({ isOpen, onClose, onAdd }: AddTodoModalProps) => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Any additional details..."
+              ref={descriptionRef}
               rows={3}
-              className="focus:outline-none focus:ring-0 focus-visible:ring-0"
+              className="focus:outline-none focus:ring-0 focus-visible:ring-0 min-h-[80px] max-h-[300px]"
             />
           </div>
 
