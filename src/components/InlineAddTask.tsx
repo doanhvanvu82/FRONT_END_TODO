@@ -94,10 +94,19 @@ const InlineAddTask = ({ onAdd, onCancel }: InlineAddTaskProps) => {
   const [aiSuggestions, setAiSuggestions] = useState<string[] | null>(null);
   const [aiError, setAiError] = useState<string | null>(null);
   const titleInputRef = useRef<HTMLInputElement>(null);
+  const descriptionRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     titleInputRef.current?.focus();
   }, []);
+
+  // Auto-resize description textarea when value changes
+  useEffect(() => {
+    if (descriptionRef.current) {
+      descriptionRef.current.style.height = "auto";
+      descriptionRef.current.style.height = descriptionRef.current.scrollHeight + "px";
+    }
+  }, [description]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -171,11 +180,11 @@ const InlineAddTask = ({ onAdd, onCancel }: InlineAddTaskProps) => {
           placeholder="Task name"
           className="font-medium placeholder:text-gray-400 mt-1 h-8 px-0 py-0 placeholder:text-left text-sm border-none focus-visible:ring-0 focus-visible:ring-transparent focus-visible:ring-offset-0 focus:outline-none ring-0 ring-transparent"
         />
-        {/* <div className="flex gap-2 mt-2 mb-1">
+        <div className="flex gap-2 mt-2 mb-1">
           <Button type="button" variant="secondary" onClick={handleAISuggest} disabled={aiLoading || !title.trim()} size="sm">
             {aiLoading ? "Suggesting..." : "Add with AI"}
           </Button>
-        </div> */}
+        </div>
         {aiError && <div className="text-red-500 text-xs mt-1">{aiError}</div>}
         {aiSuggestions && (
           <div className="border rounded p-2 mt-2 bg-gray-50">
@@ -202,7 +211,9 @@ const InlineAddTask = ({ onAdd, onCancel }: InlineAddTaskProps) => {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Description"
-          className="min-h-[6px] h-8 mb-0 placeholder:text-gray-400 text-[13px] px-0 py-0 placeholder:text-left focus:outline-none border-none focus:ring-0 focus:ring-transparent focus:ring-offset-0"
+          ref={descriptionRef}
+          rows={2}
+          className="min-h-[32px] mb-0 placeholder:text-gray-400 text-[13px] px-0 py-0 placeholder:text-left focus:outline-none border-none focus:ring-0 focus:ring-transparent focus:ring-offset-0"
         />
 
         {/* ⬇️ Các nút Date, Priority, Reminders, More luôn hiện và đặt ngay dưới Description */}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -36,7 +36,7 @@ interface AddTodoModalProps {
   onAdd: (
     title: string,
     description?: string,
-    priority?: "low" | "medium" | "high" | "none", 
+        priority?: "low" | "medium" | "high" | "none", 
     deadline_at?: string
   ) => void;
 }
@@ -76,8 +76,12 @@ const AddTodoModal = ({ isOpen, onClose, onAdd }: AddTodoModalProps) => {
     try {
       const suggestions = await getAISuggestions(title.trim());
       setAiSuggestions(suggestions);
-    } catch (err: any) {
-      setAiError(err.message || "Failed to get AI suggestions");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setAiError(err.message);
+      } else {
+        setAiError("Failed to get AI suggestions");
+      }
     } finally {
       setAiLoading(false);
     }
@@ -116,6 +120,16 @@ const AddTodoModal = ({ isOpen, onClose, onAdd }: AddTodoModalProps) => {
   ));
 
   CustomDateInput.displayName = "CustomDateInput";
+
+  const descriptionRef = useRef<HTMLTextAreaElement>(null);
+
+  // Auto-resize description textarea when value changes
+  useEffect(() => {
+    if (descriptionRef.current) {
+      descriptionRef.current.style.height = "auto";
+      descriptionRef.current.style.height = descriptionRef.current.scrollHeight + "px";
+    }
+  }, [description]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -170,8 +184,9 @@ const AddTodoModal = ({ isOpen, onClose, onAdd }: AddTodoModalProps) => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Any additional details..."
+              ref={descriptionRef}
               rows={3}
-              className="focus:outline-none focus:ring-0 focus-visible:ring-0"
+              className="focus:outline-none focus:ring-0 focus-visible:ring-0 min-h-[80px] max-h-[300px]"
             />
           </div>
 

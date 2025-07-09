@@ -102,6 +102,23 @@ export function AppSidebar({
 
   const isCollapsed = state === "collapsed";
 
+  // Helper for Add Task button, only show in Inbox
+  const addTaskButton = (
+    <SidebarMenuItem>
+      <SidebarMenuButton
+        asChild
+        className="w-full justify-start rounded-lg px-3 py-0 text-sm text-gray-700 hover:bg-gray-100"
+      >
+        <button onClick={() => setIsAddModalOpen(true)}>
+          <div className="flex items-center gap-3">
+            <Plus className="w-5 h-5 text-white bg-red-500 rounded-full p-1" />
+            {!isCollapsed && <span>Add task</span>}
+          </div>
+        </button>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
+  );
+
   return (
     <Sidebar
       className={`${
@@ -114,9 +131,7 @@ export function AppSidebar({
             <User className="w-4 h-4 text-white" />
           </div>
           {!isCollapsed && (
-            <span className="font-medium text-gray-900">
-              {user?.user_metadata?.username || user?.username || "User"}
-            </span>
+            <span className="font-medium text-gray-900">{user?.user_metadata?.username || user?.username || 'User'}</span>
           )}
         </div>
         <div className="absolute top-4 right-4">
@@ -128,20 +143,10 @@ export function AppSidebar({
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  asChild
-                  className="w-full justify-start rounded-lg px-3 py-0 text-sm text-gray-700 hover:bg-gray-100"
-                >
-                  <button onClick={() => setIsAddModalOpen(true)}>
-                    <div className="flex items-center gap-3">
-                      <Plus className="w-5 h-5 text-white bg-red-500 rounded-full p-1" />
-                      {!isCollapsed && <span>Add task</span>}
-                    </div>
-                  </button>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+              {/* Add Task Button: chỉ hiển thị ở Inbox */}
+              {currentSection === "inbox" ? addTaskButton : null}
 
+              {/* Main Menu Items */}
               {mainItems.map((item) => (
                 <SidebarMenuItem key={item.key}>
                   <SidebarMenuButton
@@ -183,6 +188,7 @@ export function AppSidebar({
         onAdd={onAdd}
       />
 
+      {/* Nút Đăng xuất ở cuối sidebar */}
       <div className="mt-auto mb-4 px-2">
         <SidebarMenu>
           <SidebarMenuItem>

@@ -145,7 +145,6 @@ const TodoItem = ({ todo, onToggle, onDelete }: TodoItemProps) => {
             }`}
           />
         </button>
-
         {/* Content */}
         <div className="flex-1 min-w-1">
           <div className={`text-sm break-words leading-5 transition-all duration-500 ${todo.completed ? 'line-through text-gray-400' : 'text-gray-800'}`}> 
@@ -154,7 +153,6 @@ const TodoItem = ({ todo, onToggle, onDelete }: TodoItemProps) => {
           {todo.description && (
             <p className={`text-xs mt-0.5 leading-4 break-words transition-all duration-500 ${todo.completed ? 'text-gray-300 line-through' : 'text-gray-600'}`}>{todo.description}</p>
           )}
-
           {todo.deadline_at && (
             <div className={`mt-1 flex items-center gap-1 text-[11px] transition-colors duration-200 ${isOverdue ? "text-red-600" : "text-gray-400"}`}>
               <Calendar size={12} />
@@ -162,8 +160,7 @@ const TodoItem = ({ todo, onToggle, onDelete }: TodoItemProps) => {
             </div>
           )}
         </div>
-
-        {/* Actions */}
+        {/* Enhanced Actions with smooth transitions */}
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-x-2 group-hover:translate-x-0">
           <AlertDialog>
             <AlertDialogTrigger asChild>

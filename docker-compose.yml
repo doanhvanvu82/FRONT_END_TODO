@@ -11,9 +11,9 @@ services:
       - app-network
 
   frontend:
-    # build:
-    #   context: .
-    image: ghcr.io/doanhvanvu82/todo-app:latest
+    build:
+      context: .
+    # image: ghcr.io/doanhvanvu82/todo-app:latest
     container_name: task-app-frontend
     restart: always
     ports:

@@ -91,7 +91,7 @@ export async function deleteTodo(id: number) {
 
 // AI Suggestion
 export async function getAISuggestions(title: string): Promise<string[]> {
-  const res = await fetch(`${API_URL}/ai-suggest`, {
+  const res = await fetch(`${API_URL}/api/ai-suggest`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...authHeader() },
     body: JSON.stringify({ title }),
@@ -101,4 +101,4 @@ export async function getAISuggestions(title: string): Promise<string[]> {
     throw new Error(data.error || 'Failed to get AI suggestions');
   }
   return data.suggestions;
-}
+} 
