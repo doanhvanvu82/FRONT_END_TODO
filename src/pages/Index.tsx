@@ -1,12 +1,13 @@
 import { useAuth } from "@/hooks/use-auth";
 import TodoApp from "@/components/TodoApp";
 import AuthModal from "@/components/AuthModal";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 const Index = () => {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return null; // hoặc có thể trả về spinner nếu muốn
+    return <LoadingSpinner />;
   }
 
   if (!user) {

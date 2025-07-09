@@ -1,3 +1,5 @@
+import type { Todo } from "@/types/todo";
+
 // API endpoint
 const API_URL = 'http://localhost:4000';
 
@@ -26,7 +28,7 @@ export async function register(username: string, email: string, password: string
   });
   const data = await res.json();
   if (!res.ok || data.error) {
-    throw new Error(data.error || 'Đăng ký thất bại');
+    throw new Error(data.error || 'Registration failed');
   }
   return data;
 }
@@ -39,7 +41,7 @@ export async function login(email: string, password: string) {
   });
   const data = await res.json();
   if (!res.ok || data.error) {
-    throw new Error(data.error || 'Đăng nhập thất bại');
+    throw new Error(data.error || 'Login failed');
   }
   return data;
 }
@@ -49,7 +51,7 @@ export async function getTodos() {
   const res = await fetch(`${API_URL}/todos`, {
     headers: { ...authHeader() },
   });
-  if (!res.ok) throw new Error('Lấy danh sách todo thất bại');
+  if (!res.ok) throw new Error('Failed to fetch todo list');
   return res.json();
 }
 
@@ -64,7 +66,7 @@ export async function addTodo(todo: {
     headers: { 'Content-Type': 'application/json', ...authHeader() },
     body: JSON.stringify(todo),
   });
-  if (!res.ok) throw new Error('Tạo todo thất bại');
+  if (!res.ok) throw new Error('Failed to create todo');
   return res.json();
 }
 
@@ -74,7 +76,7 @@ export async function updateTodo(id: number, data: Partial<Todo>) {
     headers: { 'Content-Type': 'application/json', ...authHeader() },
     body: JSON.stringify(data),
   });
-  if (!res.ok) throw new Error('Cập nhật todo thất bại');
+  if (!res.ok) throw new Error('Failed to update todo');
   return res.json();
 }
 
@@ -83,6 +85,20 @@ export async function deleteTodo(id: number) {
     method: 'DELETE',
     headers: { ...authHeader() },
   });
-  if (!res.ok) throw new Error('Xoá todo thất bại');
+  if (!res.ok) throw new Error('Failed to delete todo');
   return res.json();
-} 
+}
+
+// AI Suggestion
+export async function getAISuggestions(title: string): Promise<string[]> {
+  const res = await fetch(`${API_URL}/ai-suggest`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeader() },
+    body: JSON.stringify({ title }),
+  });
+  const data = await res.json();
+  if (!res.ok || data.error) {
+    throw new Error(data.error || 'Failed to get AI suggestions');
+  }
+  return data.suggestions;
+}

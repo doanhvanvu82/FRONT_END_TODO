@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Plus, MoreHorizontal, List } from "lucide-react";
 import { Todo } from "./TodoApp";
 import TodoItem from "./TodoItem";
 import InlineAddTask from "./InlineAddTask";
 import { Button } from "@/components/ui/button";
+import React from "react";
 
 interface MainContentProps {
   currentSection: string;
@@ -69,7 +70,7 @@ const MainContent = ({
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setDate(today.getDate() + 1);
 
     switch (currentSection) {
       case "today":
@@ -101,6 +102,7 @@ const MainContent = ({
   };
 
   const filteredTodos = getFilteredTodos();
+
   const handleInlineAdd = (
     title: string,
     description?: string,
@@ -127,12 +129,10 @@ const MainContent = ({
       <div className="px-40 pb-40">
         {filteredTodos.length === 0 ? (
           showInlineAdd ? (
-           
-              <InlineAddTask
-                onAdd={handleInlineAdd}
-                onCancel={() => setShowInlineAdd(false)}
-              />
-           
+            <InlineAddTask
+              onAdd={handleInlineAdd}
+              onCancel={() => setShowInlineAdd(false)}
+            />
           ) : (
             <div className="text-center py-16">
               {/* Giao diện minh họa */}
@@ -190,10 +190,7 @@ const MainContent = ({
                   onClick={() => setShowInlineAdd(true)}
                   className="group w-full text-left px-4 py-3 text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-3"
                 >
-                  <div
-                    className="w-5 h-5 flex items-center justify-center rounded-full transition-all
-               group-hover:bg-red-500"
-                  >
+                  <div className="w-5 h-5 flex items-center justify-center rounded-full transition-all group-hover:bg-red-500">
                     <Plus
                       className="w-6 h-6 text-red-600 transition-all group-hover:text-white"
                       strokeWidth={1}
@@ -209,4 +206,5 @@ const MainContent = ({
     </div>
   );
 };
+
 export default MainContent;

@@ -109,17 +109,16 @@ export function AppSidebar({
       } border-none bg-gray-50/50 transition-all duration-200`}
     >
       <SidebarHeader className="p-4 relative">
-        {/* Avatar và Tên */}
         <div className="flex items-center gap-3 mb-1">
           <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
             <User className="w-4 h-4 text-white" />
           </div>
           {!isCollapsed && (
-            <span className="font-medium text-gray-900">{user?.user_metadata?.username || user?.username || 'User'}</span>
+            <span className="font-medium text-gray-900">
+              {user?.user_metadata?.username || user?.username || "User"}
+            </span>
           )}
         </div>
-
-        {/* Nút đóng/mở ở góc phải */}
         <div className="absolute top-4 right-4">
           <SidebarTrigger className="w-10 h-10" />
         </div>
@@ -129,7 +128,6 @@ export function AppSidebar({
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {/* Add Task Button */}
               <SidebarMenuItem>
                 <SidebarMenuButton
                   asChild
@@ -144,21 +142,6 @@ export function AppSidebar({
                 </SidebarMenuButton>
               </SidebarMenuItem>
 
-              {/* Search Input - hide when collapsed */}
-              {!isCollapsed && (
-                <SidebarMenuItem>
-                  <div className="relative w-full">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <input
-                      type="text"
-                      placeholder="Search"
-                      className="w-full pl-10 pr-4 py-2 text-sm rounded-lg text-gray-700 bg-white hover:bg-gray-100 focus:outline-none"
-                    />
-                  </div>
-                </SidebarMenuItem>
-              )}
-
-              {/* Main Menu Items */}
               {mainItems.map((item) => (
                 <SidebarMenuItem key={item.key}>
                   <SidebarMenuButton
@@ -200,7 +183,6 @@ export function AppSidebar({
         onAdd={onAdd}
       />
 
-      {/* Nút Đăng xuất ở cuối sidebar */}
       <div className="mt-auto mb-4 px-2">
         <SidebarMenu>
           <SidebarMenuItem>
@@ -211,7 +193,7 @@ export function AppSidebar({
               <button onClick={logout}>
                 <div className="flex items-center gap-3">
                   <LogOut className="w-5 h-5 text-gray-500" />
-                  {!isCollapsed && <span>Đăng xuất</span>}
+                  {!isCollapsed && <span>Logout</span>}
                 </div>
               </button>
             </SidebarMenuButton>

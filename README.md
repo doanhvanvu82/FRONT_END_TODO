@@ -222,7 +222,3 @@ The app uses Tailwind CSS for styling. Key customization points:
 - **XSS Protection**: Content Security Policy headers
 - **HTTPS**: Enforced in production
 - **Dependencies**: Regular security audits
-
----
-
-Built with ❤️ using React and TypeScript
