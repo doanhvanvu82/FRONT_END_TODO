@@ -20,6 +20,18 @@ export interface Todo {
   priority?: "low" | "medium" | "high";
 }
 
+// Định nghĩa type cho dữ liệu trả về từ API
+type ApiTodo = {
+  id: number;
+  title: string;
+  description?: string;
+  completed: boolean;
+  created_at?: string;
+  completed_at?: string;
+  deadline_at?: string;
+  priority?: "low" | "medium" | "high";
+};
+
 const TodoApp = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,7 +48,7 @@ const TodoApp = () => {
       const res = await apiGetTodos();
       if (!Array.isArray(res)) throw new Error("Lỗi lấy todo");
       setTodos(
-        (res as unknown[]).map((todo: any) => ({
+        (res as ApiTodo[]).map((todo) => ({
           id: todo.id,
           title: todo.title,
           description: todo.description,

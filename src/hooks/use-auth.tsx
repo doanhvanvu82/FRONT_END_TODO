@@ -40,7 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (userStr) setUser(JSON.parse(userStr));
     }
     setLoading(false);
-  }, []);
+  }, [token]);
 
   const login = async (email: string, password: string) => {
     setLoading(true);
