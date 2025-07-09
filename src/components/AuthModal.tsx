@@ -27,7 +27,9 @@ const AuthModal = ({ open, onClose }: AuthModalProps) => {
           setEmail(email || "");
           setPassword(password || "");
           setRemember(true);
-        } catch {}
+        } catch {
+          // Ignore JSON parse errors
+        }
       }
     }
     if (!open) {

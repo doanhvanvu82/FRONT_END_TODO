@@ -76,8 +76,12 @@ const AddTodoModal = ({ isOpen, onClose, onAdd }: AddTodoModalProps) => {
     try {
       const suggestions = await getAISuggestions(title.trim());
       setAiSuggestions(suggestions);
-    } catch (err: any) {
-      setAiError(err.message || "Failed to get AI suggestions");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setAiError(err.message);
+      } else {
+        setAiError("Failed to get AI suggestions");
+      }
     } finally {
       setAiLoading(false);
     }
