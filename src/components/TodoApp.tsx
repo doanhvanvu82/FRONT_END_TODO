@@ -36,7 +36,7 @@ const TodoApp = () => {
       const res = await apiGetTodos();
       if (!Array.isArray(res)) throw new Error("Lỗi lấy todo");
       setTodos(
-        res.map((todo: any) => ({
+        (res as any[]).map((todo) => ({
           id: todo.id,
           title: todo.title,
           description: todo.description,
@@ -47,12 +47,12 @@ const TodoApp = () => {
           priority: todo.priority as "low" | "medium" | "high",
         }))
       );
-    } catch (err: any) {
-      setError(err.message || "Failed to fetch todos. Please try again.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to fetch todos. Please try again.");
       toast({
         variant: "destructive",
         title: "Error",
-        description: err.message || "Failed to fetch todos. Please try again.",
+        description: err instanceof Error ? err.message : "Failed to fetch todos. Please try again.",
       });
     } finally {
       setLoading(false);
@@ -85,11 +85,11 @@ const TodoApp = () => {
         title: "Success",
         description: "Todo added successfully!",
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: err.message || "Failed to add todo. Please try again.",
+        description: err instanceof Error ? err.message : "Failed to add todo. Please try again.",
       });
     }
   };
@@ -125,11 +125,11 @@ const TodoApp = () => {
           ? "Tiếp tục cố gắng nhé!"
           : "Xuất sắc! 🎉",
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast({
         variant: "destructive",
         title: "Lỗi",
-        description: err.message || "Không thể cập nhật công việc. Vui lòng thử lại.",
+        description: err instanceof Error ? err.message : "Không thể cập nhật công việc. Vui lòng thử lại.",
       });
     }
   };
@@ -144,11 +144,11 @@ const TodoApp = () => {
         title: "Đã xoá công việc",
         description: "Công việc đã được xoá thành công.",
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast({
         variant: "destructive",
         title: "Lỗi",
-        description: err.message || "Không thể xoá công việc. Vui lòng thử lại.",
+        description: err instanceof Error ? err.message : "Không thể xoá công việc. Vui lòng thử lại.",
       });
     }
   };

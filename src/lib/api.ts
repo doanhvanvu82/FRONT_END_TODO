@@ -68,7 +68,7 @@ export async function addTodo(todo: {
   return res.json();
 }
 
-export async function updateTodo(id: number, data: any) {
+export async function updateTodo(id: number, data: Partial<Todo>) {
   const res = await fetch(`${API_URL}/todos/${id}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', ...authHeader() },

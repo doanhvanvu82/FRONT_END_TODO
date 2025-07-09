@@ -1,10 +1,19 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { login as apiLogin, register as apiRegister, setToken, getToken, removeToken } from '../lib/api';
 
+interface UserMetadata {
+  username?: string;
+  email?: string;
+  email_verified?: boolean;
+  phone_verified?: boolean;
+  sub?: string;
+}
+
 interface User {
   id: string;
   email: string;
-  [key: string]: any;
+  user_metadata?: UserMetadata;
+  [key: string]: unknown;
 }
 
 interface AuthContextType {
