@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Plus, MoreHorizontal, List } from "lucide-react";
 import { Todo } from "./TodoApp";
 import TodoItem from "./TodoItem";
 import InlineAddTask from "./InlineAddTask";
 import { Button } from "@/components/ui/button";
+import React from "react";
 
 interface MainContentProps {
   currentSection: string;
@@ -26,6 +27,8 @@ const MainContent = ({
   onAdd,
 }: MainContentProps) => {
   const [showInlineAdd, setShowInlineAdd] = useState(false);
+  // Xóa toàn bộ state và logic liên quan đến pendingRemove, handleToggle, removeTimeouts
+  // Trả lại onToggle gốc cho TodoItem
 
   const getSectionTitle = () => {
     switch (currentSection) {
@@ -125,37 +128,49 @@ const MainContent = ({
 
       {/* Content */}
       <div className="px-40 pb-40">
-        {filteredTodos.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-yellow-200 via-yellow-300 to-yellow-400 rounded-2xl flex items-center justify-center">
-              <div className="w-16 h-12 bg-yellow-500 rounded-lg relative">
-                <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-600 rounded-full"></div>
-                <div className="absolute -top-2 -left-2 w-3 h-6 bg-green-400 rounded-full transform rotate-12"></div>
-                <div className="absolute -bottom-2 -right-2 w-3 h-6 bg-green-400 rounded-full transform -rotate-12"></div>
-                <div className="absolute -top-1 right-4 w-2 h-2 bg-yellow-300 rounded-full"></div>
-                <div className="absolute -bottom-1 left-2 w-2 h-2 bg-yellow-300 rounded-full"></div>
+      {filteredTodos.length === 0 ? (
+          showInlineAdd ? (
+           
+              <InlineAddTask
+                onAdd={handleInlineAdd}
+                onCancel={() => setShowInlineAdd(false)}
+              />
+           
+          ) : (
+            <div className="text-center py-16">
+              {/* Giao diện minh họa */}
+              <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-yellow-200 via-yellow-300 to-yellow-400 rounded-2xl flex items-center justify-center">
+                <div className="w-16 h-12 bg-yellow-500 rounded-lg relative">
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-600 rounded-full"></div>
+                  <div className="absolute -top-2 -left-2 w-3 h-6 bg-green-400 rounded-full transform rotate-12"></div>
+                  <div className="absolute -bottom-2 -right-2 w-3 h-6 bg-green-400 rounded-full transform -rotate-12"></div>
+                  <div className="absolute -top-1 right-4 w-2 h-2 bg-yellow-300 rounded-full"></div>
+                  <div className="absolute -bottom-1 left-2 w-2 h-2 bg-yellow-300 rounded-full"></div>
+                </div>
               </div>
+
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                {currentSection === "completed"
+                  ? "No completed tasks yet"
+                  : "Capture now, plan later"}
+              </h3>
+              <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                {currentSection === "completed"
+                  ? "Complete some tasks to see them here."
+                  : getSectionDescription()}
+              </p>
+
+              {currentSection !== "completed" && (
+                <Button
+                  onClick={() => setShowInlineAdd(true)}
+                  className="bg-red-500 hover:bg-red-600 text-white"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add task
+                </Button>
+              )}
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              {currentSection === "completed"
-                ? "No completed tasks yet"
-                : "Capture now, plan later"}
-            </h3>
-            <p className="text-gray-600 mb-6 max-w-md mx-auto">
-              {currentSection === "completed"
-                ? "Complete some tasks to see them here."
-                : getSectionDescription()}
-            </p>
-            {currentSection !== "completed" && (
-              <Button
-                onClick={() => setShowInlineAdd(true)}
-                className="bg-red-500 hover:bg-red-600 text-white"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Add task
-              </Button>
-            )}
-          </div>
+          )
         ) : (
           <div>
             {filteredTodos.map((todo) => (

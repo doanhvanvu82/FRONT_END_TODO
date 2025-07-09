@@ -1,4 +1,4 @@
-import { Check, Trash2, Calendar, MoreHorizontal } from "lucide-react";
+import { Check, Trash2, Calendar, MoreHorizontal, Loader2 } from "lucide-react";
 import { Todo } from "./TodoApp";
 import {
   AlertDialog,
@@ -114,19 +114,19 @@ const TodoItem = ({ todo, onToggle, onDelete }: TodoItemProps) => {
     !todo.completed;
 
   return (
-    <div className="border-b last:border-none border-gray-200/60 py-2 px-1 group hover:bg-gray-50/50 transition-colors duration-200">
+    <div className={`border-b last:border-none border-gray-200/60 py-2 px-1 group hover:bg-gray-50/50 transition-colors duration-200 ${todo.completed ? 'transition-all duration-500' : ''}`}>
       <div className="flex items-start gap-2">
         {/* Enhanced Checkbox with animations */}
         <button
-          onClick={() => {
+          onClick={async () => {
             if (todo.completed) {
-              onToggle(todo.id); // nếu đã completed thì toggle luôn
+              await onToggle(todo.id);
             } else {
-              setIsTicking(true); // hiển thị dấu tích giả
-              setTimeout(() => {
+              setIsTicking(true);
+              setTimeout(async () => {
                 setIsTicking(false);
-                onToggle(todo.id); // sau delay mới toggle thật
-              }, 1000); // delay 400ms
+                await onToggle(todo.id);
+              }, 800);
             }
           }}
           className={`w-[14px] h-[14px] mt-1 border-2 rounded-sm flex items-center justify-center transition-all duration-300 transform hover:scale-110 active:scale-95 shadow-sm ${
@@ -138,7 +138,7 @@ const TodoItem = ({ todo, onToggle, onDelete }: TodoItemProps) => {
                   todo.priority
                 )} hover:border-opacity-80 hover:shadow-md bg-white`
           }`}
-          aria-label="Đánh dấu là đã hoàn thành"
+          aria-label="Mark as completed"
         >
           <Check
             size={10}
@@ -150,41 +150,21 @@ const TodoItem = ({ todo, onToggle, onDelete }: TodoItemProps) => {
             }`}
           />
         </button>
-
         {/* Content */}
         <div className="flex-1 min-w-1">
-          <div className="text-sm text-gray-800 break-words leading-5">
-            <span
-              className={`transition-all duration-300 ${
-                todo.completed ? "line-through text-gray-400" : ""
-              }`}
-            >
-              {todo.title}
-            </span>
+          <div className={`text-sm break-words leading-5 transition-all duration-500 ${todo.completed ? 'line-through text-gray-400' : 'text-gray-800'}`}> 
+            <span>{todo.title}</span>
           </div>
-
           {todo.description && (
-            <p
-              className={`text-xs mt-0.5 leading-4 break-words transition-all duration-300 ${
-                todo.completed ? "text-gray-300 line-through" : "text-gray-600"
-              }`}
-            >
-              {todo.description}
-            </p>
+            <p className={`text-xs mt-0.5 leading-4 break-words transition-all duration-500 ${todo.completed ? 'text-gray-300 line-through' : 'text-gray-600'}`}>{todo.description}</p>
           )}
-
           {todo.deadline_at && (
-            <div
-              className={`mt-1 flex items-center gap-1 text-[11px] transition-colors duration-200 ${
-                isOverdue ? "text-red-600" : "text-gray-400"
-              }`}
-            >
+            <div className={`mt-1 flex items-center gap-1 text-[11px] transition-colors duration-200 ${isOverdue ? "text-red-600" : "text-gray-400"}`}>
               <Calendar size={12} />
               <span>{formatDate(todo.deadline_at)}</span>
             </div>
           )}
         </div>
-
         {/* Enhanced Actions with smooth transitions */}
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-x-2 group-hover:translate-x-0">
           <AlertDialog>

@@ -19,6 +19,7 @@ import { Calendar as CalendarIcon } from "lucide-react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { forwardRef } from "react";
+import { getAISuggestions } from "@/lib/api";
 
 interface CustomInputProps {
   value?: string;
@@ -89,6 +90,9 @@ const InlineAddTask = ({ onAdd, onCancel }: InlineAddTaskProps) => {
   );
   const [deadline, setDeadline] = useState("");
   const [showDetails, setShowDetails] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiSuggestions, setAiSuggestions] = useState<string[] | null>(null);
+  const [aiError, setAiError] = useState<string | null>(null);
   const titleInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -118,6 +122,37 @@ const InlineAddTask = ({ onAdd, onCancel }: InlineAddTaskProps) => {
     }
   };
 
+  const handleAISuggest = async () => {
+    if (!title.trim()) return;
+    setAiLoading(true);
+    setAiError(null);
+    try {
+      const suggestions = await getAISuggestions(title.trim());
+      setAiSuggestions(suggestions);
+    } catch (err: any) {
+      setAiError(err.message || "Failed to get AI suggestions");
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const handleAIApprove = () => {
+    if (aiSuggestions) {
+      setDescription(aiSuggestions.join("\n"));
+      setAiSuggestions(null);
+    }
+  };
+
+  const handleAIReject = () => {
+    setAiSuggestions(null);
+    setAiError(null);
+  };
+
+  const handleAIDeleteItem = (idx: number) => {
+    if (!aiSuggestions) return;
+    setAiSuggestions(aiSuggestions.filter((_, i) => i !== idx));
+  };
+
   return (
     <div className="bg-white border border-gray-200 rounded-lg px-4 shadow-sm mt-1">
       <form
@@ -132,7 +167,33 @@ const InlineAddTask = ({ onAdd, onCancel }: InlineAddTaskProps) => {
           placeholder="Task name"
           className="font-medium placeholder:text-gray-400 mt-1 h-8 px-0 py-0 placeholder:text-left text-sm border-none focus-visible:ring-0 focus-visible:ring-transparent focus-visible:ring-offset-0 focus:outline-none ring-0 ring-transparent"
         />
-
+        {/* <div className="flex gap-2 mt-2 mb-1">
+          <Button type="button" variant="secondary" onClick={handleAISuggest} disabled={aiLoading || !title.trim()} size="sm">
+            {aiLoading ? "Suggesting..." : "Add with AI"}
+          </Button>
+        </div> */}
+        {aiError && <div className="text-red-500 text-xs mt-1">{aiError}</div>}
+        {aiSuggestions && (
+          <div className="border rounded p-2 mt-2 bg-gray-50">
+            <div className="font-semibold mb-1">AI Suggestions:</div>
+            <ul className="mb-2">
+              {aiSuggestions.map((item, idx) => (
+                <li key={idx} className="flex items-center gap-2 mb-1">
+                  <span>{item}</span>
+                  <button type="button" className="text-xs text-red-500 hover:underline" onClick={() => handleAIDeleteItem(idx)}>Delete</button>
+                </li>
+              ))}
+            </ul>
+            <div className="flex gap-2">
+              <Button type="button" size="sm" onClick={handleAIApprove}>
+                Approve
+              </Button>
+              <Button type="button" size="sm" variant="outline" onClick={handleAIReject}>
+                Reject
+              </Button>
+            </div>
+          </div>
+        )}
         <Textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}

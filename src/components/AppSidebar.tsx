@@ -144,20 +144,6 @@ export function AppSidebar({
                 </SidebarMenuButton>
               </SidebarMenuItem>
 
-              {/* Search Input - hide when collapsed */}
-              {!isCollapsed && (
-                <SidebarMenuItem>
-                  <div className="relative w-full">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <input
-                      type="text"
-                      placeholder="Search"
-                      className="w-full pl-10 pr-4 py-2 text-sm rounded-lg text-gray-700 bg-white hover:bg-gray-100 focus:outline-none"
-                    />
-                  </div>
-                </SidebarMenuItem>
-              )}
-
               {/* Main Menu Items */}
               {mainItems.map((item) => (
                 <SidebarMenuItem key={item.key}>
@@ -211,7 +197,7 @@ export function AppSidebar({
               <button onClick={logout}>
                 <div className="flex items-center gap-3">
                   <LogOut className="w-5 h-5 text-gray-500" />
-                  {!isCollapsed && <span>Đăng xuất</span>}
+                  {!isCollapsed && <span>Logout</span>}
                 </div>
               </button>
             </SidebarMenuButton>
