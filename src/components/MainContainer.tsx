@@ -75,7 +75,7 @@ const MainContent = ({
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setDate(today.getDate() + 1);
 
     switch (currentSection) {
       case "today":
@@ -107,6 +107,7 @@ const MainContent = ({
   };
 
   const filteredTodos = getFilteredTodos();
+
   const handleInlineAdd = (
     title: string,
     description?: string,
@@ -218,4 +219,5 @@ const MainContent = ({
     </div>
   );
 };
+
 export default MainContent;
