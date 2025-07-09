@@ -126,7 +126,6 @@ export function AppSidebar({
       } border-none bg-gray-50/50 transition-all duration-200`}
     >
       <SidebarHeader className="p-4 relative">
-        {/* Avatar và Tên */}
         <div className="flex items-center gap-3 mb-1">
           <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
             <User className="w-4 h-4 text-white" />
@@ -135,8 +134,6 @@ export function AppSidebar({
             <span className="font-medium text-gray-900">{user?.user_metadata?.username || user?.username || 'User'}</span>
           )}
         </div>
-
-        {/* Nút đóng/mở ở góc phải */}
         <div className="absolute top-4 right-4">
           <SidebarTrigger className="w-10 h-10" />
         </div>

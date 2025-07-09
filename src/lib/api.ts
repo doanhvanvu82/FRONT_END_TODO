@@ -1,4 +1,5 @@
 import type { Todo } from "@/types/todo";
+
 // API endpoint
 const API_URL = 'http://localhost:4000';
 

@@ -12,6 +12,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useState } from "react";
+
 interface TodoItemProps {
   todo: Todo;
   onToggle: (id: number) => void;
@@ -46,6 +47,7 @@ const getColorClass = (priority?: "low" | "medium" | "high") => {
 
 const TodoItem = ({ todo, onToggle, onDelete }: TodoItemProps) => {
   const [isTicking, setIsTicking] = useState(false);
+
   const formatDate = (dateString?: string) => {
     if (!dateString) return "";
     const date = new Date(
@@ -101,13 +103,6 @@ const TodoItem = ({ todo, onToggle, onDelete }: TodoItemProps) => {
     })} at ${timeString}`;
   };
 
-  // Hàm lấy số tuần của 1 ngày trong năm
-  const getWeekNumber = (date: Date): number => {
-    const firstDay = new Date(date.getFullYear(), 0, 1);
-    const pastDaysOfYear = (date.getTime() - firstDay.getTime()) / 86400000;
-    return Math.ceil((pastDaysOfYear + firstDay.getDay() + 1) / 7);
-  };
-
   const isOverdue =
     todo.deadline_at &&
     new Date(todo.deadline_at) < new Date() &&
@@ -116,7 +111,7 @@ const TodoItem = ({ todo, onToggle, onDelete }: TodoItemProps) => {
   return (
     <div className={`border-b last:border-none border-gray-200/60 py-2 px-1 group hover:bg-gray-50/50 transition-colors duration-200 ${todo.completed ? 'transition-all duration-500' : ''}`}>
       <div className="flex items-start gap-2">
-        {/* Enhanced Checkbox with animations */}
+        {/* Checkbox */}
         <button
           onClick={async () => {
             if (todo.completed) {

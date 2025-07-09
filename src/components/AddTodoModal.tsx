@@ -118,6 +118,7 @@ const AddTodoModal = ({ isOpen, onClose, onAdd }: AddTodoModalProps) => {
       <span className="truncate">{value || "Select date"}</span>
     </button>
   ));
+
   CustomDateInput.displayName = "CustomDateInput";
 
   const descriptionRef = useRef<HTMLTextAreaElement>(null);
@@ -223,14 +224,12 @@ const AddTodoModal = ({ isOpen, onClose, onAdd }: AddTodoModalProps) => {
               </SelectTrigger>
 
               <SelectContent>
-
                 <SelectItem value="none">
                   <div className="flex items-center gap-2">
                     <Flag className="w-3 h-3 text-gray-400" />
                     <span>No priority</span>
                   </div>
                 </SelectItem>
-
                 <SelectItem value="low">
                   <div className="flex items-center gap-2">
                     <Flag className="w-3 h-3 text-green-500" />
