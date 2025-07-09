@@ -12,6 +12,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useState } from "react";
+
 interface TodoItemProps {
   todo: Todo;
   onToggle: (id: number) => void;
@@ -46,6 +47,7 @@ const getColorClass = (priority?: "low" | "medium" | "high") => {
 
 const TodoItem = ({ todo, onToggle, onDelete }: TodoItemProps) => {
   const [isTicking, setIsTicking] = useState(false);
+
   const formatDate = (dateString?: string) => {
     if (!dateString) return "";
     const date = new Date(
@@ -101,13 +103,6 @@ const TodoItem = ({ todo, onToggle, onDelete }: TodoItemProps) => {
     })} at ${timeString}`;
   };
 
-  // Hàm lấy số tuần của 1 ngày trong năm
-  const getWeekNumber = (date: Date): number => {
-    const firstDay = new Date(date.getFullYear(), 0, 1);
-    const pastDaysOfYear = (date.getTime() - firstDay.getTime()) / 86400000;
-    return Math.ceil((pastDaysOfYear + firstDay.getDay() + 1) / 7);
-  };
-
   const isOverdue =
     todo.deadline_at &&
     new Date(todo.deadline_at) < new Date() &&
@@ -116,7 +111,7 @@ const TodoItem = ({ todo, onToggle, onDelete }: TodoItemProps) => {
   return (
     <div className={`border-b last:border-none border-gray-200/60 py-2 px-1 group hover:bg-gray-50/50 transition-colors duration-200 ${todo.completed ? 'transition-all duration-500' : ''}`}>
       <div className="flex items-start gap-2">
-        {/* Enhanced Checkbox with animations */}
+        {/* Checkbox */}
         <button
           onClick={async () => {
             if (todo.completed) {
@@ -150,6 +145,7 @@ const TodoItem = ({ todo, onToggle, onDelete }: TodoItemProps) => {
             }`}
           />
         </button>
+
         {/* Content */}
         <div className="flex-1 min-w-1">
           <div className={`text-sm break-words leading-5 transition-all duration-500 ${todo.completed ? 'line-through text-gray-400' : 'text-gray-800'}`}> 
@@ -158,6 +154,7 @@ const TodoItem = ({ todo, onToggle, onDelete }: TodoItemProps) => {
           {todo.description && (
             <p className={`text-xs mt-0.5 leading-4 break-words transition-all duration-500 ${todo.completed ? 'text-gray-300 line-through' : 'text-gray-600'}`}>{todo.description}</p>
           )}
+
           {todo.deadline_at && (
             <div className={`mt-1 flex items-center gap-1 text-[11px] transition-colors duration-200 ${isOverdue ? "text-red-600" : "text-gray-400"}`}>
               <Calendar size={12} />
@@ -165,7 +162,8 @@ const TodoItem = ({ todo, onToggle, onDelete }: TodoItemProps) => {
             </div>
           )}
         </div>
-        {/* Enhanced Actions with smooth transitions */}
+
+        {/* Actions */}
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-x-2 group-hover:translate-x-0">
           <AlertDialog>
             <AlertDialogTrigger asChild>

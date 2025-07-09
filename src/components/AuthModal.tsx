@@ -27,9 +27,7 @@ const AuthModal = ({ open, onClose }: AuthModalProps) => {
           setEmail(email || "");
           setPassword(password || "");
           setRemember(true);
-        } catch {
-          // Ignore JSON parse errors
-        }
+        } catch {}
       }
     }
     if (!open) {
@@ -89,6 +87,7 @@ const AuthModal = ({ open, onClose }: AuthModalProps) => {
               )}
             </div>
           </div>
+
           {!isLogin && (
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">Username</label>
@@ -103,6 +102,7 @@ const AuthModal = ({ open, onClose }: AuthModalProps) => {
               />
             </div>
           )}
+
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email address</label>
             <input
@@ -115,6 +115,7 @@ const AuthModal = ({ open, onClose }: AuthModalProps) => {
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-400"
             />
           </div>
+
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Password</label>
             <input
@@ -127,6 +128,7 @@ const AuthModal = ({ open, onClose }: AuthModalProps) => {
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-400"
             />
           </div>
+
           {!isLogin && (
             <div>
               <label htmlFor="rePassword" className="block text-sm font-medium text-gray-700 mb-1">Re-enter password</label>
@@ -141,6 +143,7 @@ const AuthModal = ({ open, onClose }: AuthModalProps) => {
               />
             </div>
           )}
+
           {isLogin && (
             <div className="flex items-center gap-2">
               <input
@@ -153,7 +156,9 @@ const AuthModal = ({ open, onClose }: AuthModalProps) => {
               <label htmlFor="remember" className="text-sm text-gray-700 select-none">Remember me</label>
             </div>
           )}
+
           {error && <div className="text-red-500 text-sm text-center -mt-2">{error}</div>}
+
           <button
             type="submit"
             className="w-full py-2 rounded-md text-white font-semibold text-base bg-red-500 hover:bg-red-600 transition-colors"
@@ -161,6 +166,7 @@ const AuthModal = ({ open, onClose }: AuthModalProps) => {
           >
             {isLogin ? "Sign in" : "Register"}
           </button>
+
           <div className="text-center text-sm mt-2">
             {isLogin ? (
               <>
@@ -192,4 +198,4 @@ const AuthModal = ({ open, onClose }: AuthModalProps) => {
   );
 };
 
-export default AuthModal; 
+export default AuthModal;

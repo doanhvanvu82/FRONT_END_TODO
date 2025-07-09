@@ -1,4 +1,5 @@
 import type { Todo } from "@/types/todo";
+
 // API endpoint
 const API_URL = 'http://localhost:4000';
 
@@ -100,4 +101,4 @@ export async function getAISuggestions(title: string): Promise<string[]> {
     throw new Error(data.error || 'Failed to get AI suggestions');
   }
   return data.suggestions;
-} 
+}

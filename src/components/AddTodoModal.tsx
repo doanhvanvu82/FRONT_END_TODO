@@ -36,7 +36,7 @@ interface AddTodoModalProps {
   onAdd: (
     title: string,
     description?: string,
-        priority?: "low" | "medium" | "high" | "none", 
+    priority?: "low" | "medium" | "high" | "none", 
     deadline_at?: string
   ) => void;
 }
@@ -76,12 +76,8 @@ const AddTodoModal = ({ isOpen, onClose, onAdd }: AddTodoModalProps) => {
     try {
       const suggestions = await getAISuggestions(title.trim());
       setAiSuggestions(suggestions);
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setAiError(err.message);
-      } else {
-        setAiError("Failed to get AI suggestions");
-      }
+    } catch (err: any) {
+      setAiError(err.message || "Failed to get AI suggestions");
     } finally {
       setAiLoading(false);
     }
@@ -118,6 +114,7 @@ const AddTodoModal = ({ isOpen, onClose, onAdd }: AddTodoModalProps) => {
       <span className="truncate">{value || "Select date"}</span>
     </button>
   ));
+
   CustomDateInput.displayName = "CustomDateInput";
 
   return (
@@ -137,11 +134,11 @@ const AddTodoModal = ({ isOpen, onClose, onAdd }: AddTodoModalProps) => {
               className="focus:outline-none focus:ring-0 focus-visible:ring-0"
               required
             />
-            {/* <div className="flex gap-2 mt-2">
+            <div className="flex gap-2 mt-2">
               <Button type="button" variant="secondary" onClick={handleAISuggest} disabled={aiLoading || !title.trim()}>
                 {aiLoading ? "Suggesting..." : "Add with AI"}
               </Button>
-            </div> */}
+            </div>
             {aiError && <div className="text-red-500 text-xs mt-1">{aiError}</div>}
             {aiSuggestions && (
               <div className="border rounded p-2 mt-2 bg-gray-50">
@@ -212,14 +209,12 @@ const AddTodoModal = ({ isOpen, onClose, onAdd }: AddTodoModalProps) => {
               </SelectTrigger>
 
               <SelectContent>
-
                 <SelectItem value="none">
                   <div className="flex items-center gap-2">
                     <Flag className="w-3 h-3 text-gray-400" />
                     <span>No priority</span>
                   </div>
                 </SelectItem>
-
                 <SelectItem value="low">
                   <div className="flex items-center gap-2">
                     <Flag className="w-3 h-3 text-green-500" />
