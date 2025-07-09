@@ -36,7 +36,7 @@ const TodoApp = () => {
       const res = await apiGetTodos();
       if (!Array.isArray(res)) throw new Error("Lỗi lấy todo");
       setTodos(
-        (res as any[]).map((todo) => ({
+        (res as unknown[]).map((todo: any) => ({
           id: todo.id,
           title: todo.title,
           description: todo.description,

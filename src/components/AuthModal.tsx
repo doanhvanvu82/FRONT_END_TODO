@@ -37,8 +37,8 @@ const AuthModal = ({ open, onClose }: AuthModalProps) => {
         await register(username, email, password, rePassword);
       }
       onClose();
-    } catch (err: any) {
-      setError(err.message || "Đã có lỗi xảy ra");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Đã có lỗi xảy ra");
     }
   };
 
