@@ -44,20 +44,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     setLoading(true);
-    const res = await apiLogin(email, password);
-    setToken(res.session.access_token);
-    setTokenState(res.session.access_token);
-    setUser(res.user);
-    localStorage.setItem('user', JSON.stringify(res.user));
-    setLoading(false);
+    try {
+      const res = await apiLogin(email, password);
+      setToken(res.session.access_token);
+      setTokenState(res.session.access_token);
+      setUser(res.user);
+      localStorage.setItem('user', JSON.stringify(res.user));
+      setLoading(false);
+    } catch (err) {
+      setLoading(false);
+      throw err;
+    }
   };
 
   const register = async (username: string, email: string, password: string, rePassword: string) => {
     setLoading(true);
-    await apiRegister(username, email, password, rePassword);
-    // Đăng ký xong tự động đăng nhập
-    await login(email, password);
-    setLoading(false);
+    try {
+      await apiRegister(username, email, password, rePassword);
+      // Do not auto-login after registration
+      setLoading(false);
+    } catch (err) {
+      setLoading(false);
+      throw err;
+    }
   };
 
   const logout = () => {
