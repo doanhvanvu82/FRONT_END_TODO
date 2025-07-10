@@ -1,16 +1,22 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
+import { useToast } from "@/hooks/use-toast";
 
 interface AuthModalProps {
   open: boolean;
   onClose: () => void;
+  isLogin?: boolean;
+  onModeSwitch?: (isLogin: boolean) => void;
+  onRegisterSuccess?: () => void;
 }
 
 const REMEMBER_KEY = "todoapp_remember";
 
-const AuthModal = ({ open, onClose }: AuthModalProps) => {
+const AuthModal = ({ open, onClose, isLogin: isLoginProp, onModeSwitch, onRegisterSuccess }: AuthModalProps) => {
   const { login, register, loading } = useAuth();
-  const [isLogin, setIsLogin] = useState(true);
+  const { toast } = useToast();
+  const [internalIsLogin, setInternalIsLogin] = useState(true);
+  const isLogin = isLoginProp !== undefined ? isLoginProp : internalIsLogin;
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -40,6 +46,25 @@ const AuthModal = ({ open, onClose }: AuthModalProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    
+    // Client-side validation
+    if (!email.trim()) {
+      setError("Please enter your email address");
+      return;
+    }
+    
+    if (!password.trim()) {
+      setError("Please enter your password");
+      return;
+    }
+    
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError("Please enter a valid email address");
+      return;
+    }
+    
     try {
       if (isLogin) {
         await login(email, password);
@@ -48,6 +73,7 @@ const AuthModal = ({ open, onClose }: AuthModalProps) => {
         } else {
           localStorage.removeItem(REMEMBER_KEY);
         }
+        onClose(); // <-- Chỉ gọi khi không có lỗi
       } else {
         if (!username.trim()) {
           setError("Please enter a username");
@@ -57,22 +83,73 @@ const AuthModal = ({ open, onClose }: AuthModalProps) => {
           setError("Passwords do not match");
           return;
         }
+        if (password.length < 6) {
+          setError("Password must be at least 6 characters long");
+          return;
+        }
         await register(username, email, password, rePassword);
+        if (onRegisterSuccess) {
+          onRegisterSuccess();
+        } else {
+          onClose();
+        }
       }
-      onClose();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      let msg = err instanceof Error ? err.message : "An error occurred. Please try again.";
+      if (isLogin && msg === "Invalid login credentials") {
+        msg = "Incorrect email or password.";
+      } else if (!isLogin && msg === "User already registered") {
+        msg = "Email is already registered.";
+      }
+      setError(msg);
+      // Removed toast notifications for login and register errors
     }
   };
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
+    if (error) setError(null); // Clear error when user starts typing
     if (remember) setRemember(false);
   };
+  
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
+    if (error) setError(null); // Clear error when user starts typing
     if (remember) setRemember(false);
   };
+  
+  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUsername(e.target.value);
+    if (error) setError(null); // Clear error when user starts typing
+  };
+  
+  const handleRePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setRePassword(e.target.value);
+    if (error) setError(null); // Clear error when user starts typing
+  };
+
+  const clearForm = () => {
+    setUsername("");
+    setEmail("");
+    setPassword("");
+    setRePassword("");
+    setError(null);
+  };
+
+  const handleModeSwitch = (newMode: boolean) => {
+    if (onModeSwitch) {
+      onModeSwitch(newMode);
+    } else {
+      setInternalIsLogin(newMode);
+    }
+    // clearForm(); // Bỏ reset form khi chuyển mode
+  };
+
+  useEffect(() => {
+    if (!open) {
+      clearForm(); // Chỉ reset form khi đóng modal
+    }
+  }, [open]);
 
   if (open) {
     document.body.style.background = "#f6f9fb";
@@ -106,7 +183,7 @@ const AuthModal = ({ open, onClose }: AuthModalProps) => {
                 type="text"
                 placeholder="Username"
                 value={username}
-                onChange={e => setUsername(e.target.value)}
+                onChange={handleUsernameChange}
                 required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-400"
               />
@@ -144,31 +221,71 @@ const AuthModal = ({ open, onClose }: AuthModalProps) => {
                 type="password"
                 placeholder="Re-enter password"
                 value={rePassword}
-                onChange={e => setRePassword(e.target.value)}
+                onChange={handleRePasswordChange}
                 required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-400"
               />
             </div>
           )}
           {isLogin && (
-            <div className="flex items-center gap-2">
-              <input
-                id="remember"
-                type="checkbox"
-                checked={remember}
-                onChange={e => setRemember(e.target.checked)}
-                className="h-4 w-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
-              />
-              <label htmlFor="remember" className="text-sm text-gray-700 select-none">Remember me</label>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <input
+                  id="remember"
+                  type="checkbox"
+                  checked={remember}
+                  onChange={e => {
+                    setRemember(e.target.checked);
+                    if (!e.target.checked) {
+                      localStorage.removeItem(REMEMBER_KEY);
+                    }
+                  }}
+                  className="h-4 w-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+                />
+                <label htmlFor="remember" className="text-sm text-gray-700 select-none">Remember me</label>
+              </div>
+              <button
+                type="button"
+                className="text-sm text-red-600 hover:text-red-700 underline"
+                onClick={() => {
+                  // TODO: Implement forgot password functionality
+                  alert("Forgot password functionality will be implemented soon.");
+                }}
+              >
+                Forgot password?
+              </button>
             </div>
           )}
-          {error && <div className="text-red-500 text-sm text-center -mt-2">{error}</div>}
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-md p-3 -mt-2">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm text-red-700">{error}</p>
+                </div>
+              </div>
+            </div>
+          )}
           <button
             type="submit"
-            className="w-full py-2 rounded-md text-white font-semibold text-base bg-red-500 hover:bg-red-600 transition-colors"
+            className="w-full py-2 rounded-md text-white font-semibold text-base bg-red-500 hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             disabled={loading}
           >
-            {isLogin ? "Sign in" : "Register"}
+            {loading ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                {isLogin ? "Signing in..." : "Creating account..."}
+              </>
+            ) : (
+              isLogin ? "Sign in" : "Register"
+            )}
           </button>
           <div className="text-center text-sm mt-2">
             {isLogin ? (
@@ -176,7 +293,7 @@ const AuthModal = ({ open, onClose }: AuthModalProps) => {
                 <span>New here? </span>
                 <button
                   className="text-red-600 font-semibold underline hover:text-red-700 transition-colors"
-                  onClick={() => setIsLogin(false)}
+                  onClick={() => handleModeSwitch(false)}
                   type="button"
                 >
                   Register
@@ -187,7 +304,7 @@ const AuthModal = ({ open, onClose }: AuthModalProps) => {
                 <span>Already have an account? </span>
                 <button
                   className="text-red-600 font-semibold underline hover:text-red-700 transition-colors"
-                  onClick={() => setIsLogin(true)}
+                  onClick={() => handleModeSwitch(true)}
                   type="button"
                 >
                   Sign in

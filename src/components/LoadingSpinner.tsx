@@ -10,8 +10,8 @@ const LoadingSpinner = () => {
             <CheckCircle className="w-8 h-8 text-red-400 animate-bounce" />
           </span>
         </span>
-        <p className="text-gray-700 font-semibold text-lg mb-1">Đang chuẩn bị mọi thứ cho bạn...</p>
-        <p className="text-gray-500 text-sm">Hãy lên kế hoạch cho một ngày hiệu quả! 🚀</p>
+        <p className="text-gray-700 font-semibold text-lg mb-1">Preparing everything for you...</p>
+        <p className="text-gray-500 text-sm">Let's plan for a productive day! 🚀</p>
       </div>
     </div>
   );

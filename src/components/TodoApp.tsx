@@ -44,9 +44,9 @@ const TodoApp = () => {
     try {
       setLoading(true);
       setError(null);
-      if (!token) throw new Error("Bạn chưa đăng nhập");
+      if (!token) throw new Error("You are not logged in");
       const res = await apiGetTodos();
-      if (!Array.isArray(res)) throw new Error("Lỗi lấy todo");
+      if (!Array.isArray(res)) throw new Error("Error fetching todos");
       setTodos(
         (res as ApiTodo[]).map((todo) => ({
           id: todo.id,
@@ -154,11 +154,11 @@ const TodoApp = () => {
       );
       toast({
         title: todoToUpdate.completed
-          ? "Đã đánh dấu là chưa hoàn thành"
-          : "Hoàn thành công việc!",
+          ? "Marked as incomplete"
+          : "Task completed!",
         description: todoToUpdate.completed
-          ? "Tiếp tục cố gắng nhé!"
-          : "Xuất sắc! 🎉",
+          ? "Keep trying your best!"
+          : "Excellent! 🎉",
       });
     } catch (err: unknown) {
       // Rollback
@@ -169,8 +169,8 @@ const TodoApp = () => {
       );
       toast({
         variant: "destructive",
-        title: "Lỗi",
-        description: err instanceof Error ? err.message : "Không thể cập nhật công việc. Vui lòng thử lại.",
+        title: "Error",
+        description: err instanceof Error ? err.message : "Unable to update task. Please try again.",
       });
     }
   };
@@ -182,19 +182,19 @@ const TodoApp = () => {
     setTodos((prev) => prev.filter((todo) => todo.id !== id));
     try {
       const res = await apiDeleteTodo(id);
-      if (!res.success) throw new Error(res.message || "Lỗi xoá todo");
-      toast({
-        title: "Đã xoá công việc",
-        description: "Công việc đã được xoá thành công.",
-      });
+      if (!res.success) throw new Error(res.message || "Error deleting todo");
+              toast({
+          title: "Todo deleted",
+          description: "Todo has been deleted successfully.",
+        });
     } catch (err: unknown) {
       // Rollback
       setTodos(prevTodos);
-      toast({
-        variant: "destructive",
-        title: "Lỗi",
-        description: err instanceof Error ? err.message : "Không thể xoá công việc. Vui lòng thử lại.",
-      });
+              toast({
+          variant: "destructive",
+          title: "Error",
+          description: err instanceof Error ? err.message : "Unable to delete todo. Please try again.",
+        });
     }
   };
 
