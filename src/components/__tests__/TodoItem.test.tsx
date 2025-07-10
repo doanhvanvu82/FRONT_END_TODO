@@ -50,7 +50,7 @@ describe("TodoItem", () => {
   it("calls onToggle when checkbox clicked", async () => {
     const onToggle = vi.fn();
     render(<TodoItem todo={mockTodo} onToggle={onToggle} onDelete={vi.fn()} />);
-    const checkbox = screen.getByRole("button", { name: "Đánh dấu là đã hoàn thành" });
+    const checkbox = screen.getByRole("button", { name: "Mark as completed" });
     fireEvent.click(checkbox);
     await waitFor(() => {
       expect(onToggle).toHaveBeenCalledWith(mockTodo.id);

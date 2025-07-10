@@ -144,7 +144,21 @@ export function AppSidebar({
           <SidebarGroupContent>
             <SidebarMenu>
               {/* Add Task Button: chỉ hiển thị ở Inbox */}
-              {currentSection === "inbox" ? addTaskButton : null}
+              {(
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    className="w-full justify-start rounded-lg px-3 py-0 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    <button onClick={() => setIsAddModalOpen(true)}>
+                      <div className="flex items-center gap-3">
+                        <Plus className="w-5 h-5 text-white bg-red-500 rounded-full p-1" />
+                        {!isCollapsed && <span>Add task</span>}
+                      </div>
+                    </button>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
 
               {/* Main Menu Items */}
               {mainItems.map((item) => (

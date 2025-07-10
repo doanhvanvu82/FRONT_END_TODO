@@ -12,6 +12,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface TodoItemProps {
   todo: Todo;
@@ -194,5 +195,26 @@ const TodoItem = ({ todo, onToggle, onDelete }: TodoItemProps) => {
     </div>
   );
 };
+
+export function TodoItemSkeleton() {
+  return (
+    <div className="border-b last:border-none border-gray-200/60 py-2 px-1 group">
+      <div className="flex items-start gap-2">
+        {/* Checkbox skeleton */}
+        <Skeleton className="w-[14px] h-[14px] mt-1 rounded-sm" />
+        {/* Content skeleton */}
+        <div className="flex-1 min-w-1">
+          <Skeleton className="h-4 w-1/2 mb-2 rounded" />
+          <Skeleton className="h-3 w-1/3 mb-1 rounded" />
+          <Skeleton className="h-3 w-1/4 rounded" />
+        </div>
+        {/* Actions skeleton */}
+        <div className="flex items-center gap-1 opacity-50">
+          <Skeleton className="w-6 h-6 rounded-full" />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default TodoItem;

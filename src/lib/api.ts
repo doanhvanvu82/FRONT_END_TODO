@@ -101,4 +101,4 @@ export async function getAISuggestions(title: string): Promise<string[]> {
     throw new Error(data.error || 'Failed to get AI suggestions');
   }
   return data.suggestions;
-} 
+}
