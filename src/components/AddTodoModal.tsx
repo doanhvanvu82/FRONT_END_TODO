@@ -21,7 +21,7 @@ import {
   Flag,
   MoreHorizontal,
   ChevronLeft,
-  ChevronRight,
+  Sparkles,
   Calendar as CalendarIcon,
 } from "lucide-react";
 import DatePicker from "react-datepicker";
@@ -29,14 +29,13 @@ import "react-datepicker/dist/react-datepicker.css";
 import { forwardRef } from "react";
 import { getAISuggestions } from "@/lib/api";
 
-
 interface AddTodoModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAdd: (
     title: string,
     description?: string,
-        priority?: "low" | "medium" | "high" | "none", 
+    priority?: "low" | "medium" | "high" | "none",
     deadline_at?: string
   ) => void;
 }
@@ -118,7 +117,7 @@ const AddTodoModal = ({ isOpen, onClose, onAdd }: AddTodoModalProps) => {
       <span className="truncate">{value || "Select date"}</span>
     </button>
   ));
-  
+
   CustomDateInput.displayName = "CustomDateInput";
 
   const descriptionRef = useRef<HTMLTextAreaElement>(null);
@@ -127,9 +126,21 @@ const AddTodoModal = ({ isOpen, onClose, onAdd }: AddTodoModalProps) => {
   useEffect(() => {
     if (descriptionRef.current) {
       descriptionRef.current.style.height = "auto";
-      descriptionRef.current.style.height = descriptionRef.current.scrollHeight + "px";
+      descriptionRef.current.style.height =
+        descriptionRef.current.scrollHeight + "px";
     }
   }, [description]);
+
+  useEffect(() => {
+    if (isOpen) {
+      setTitle("");
+      setDescription("");
+      setPriority("none");
+      setDeadline("");
+      setAiSuggestions(null);
+      setAiError(null);
+    }
+  }, [isOpen]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -140,38 +151,74 @@ const AddTodoModal = ({ isOpen, onClose, onAdd }: AddTodoModalProps) => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="title">Task name *</Label>
-            <Input
-              id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g. Buy groceries"
-              className="focus:outline-none focus:ring-0 focus-visible:ring-0"
-              required
-            />
-            <div className="flex gap-2 mt-2">
-              <Button type="button" variant="secondary" onClick={handleAISuggest} disabled={aiLoading || !title.trim()}>
-                {aiLoading ? "Suggesting..." : "Suggest with AI"}
-              </Button>
+            <div className="flex items-center gap-2 mt-1">
+              <Input
+                id="title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="e.g. Buy groceries"
+                className=" flex-1 focus:outline-none focus:ring-0 focus-visible:ring-0"
+                required
+              />
+              <button
+                type="button"
+                onClick={handleAISuggest}
+                disabled={aiLoading || !title.trim()}
+                className="inline-flex items-center gap-1 px-2 py-[11px] text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-1 hover:bg-gray-50"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-gray-600" />
+                {aiLoading ? "Suggesting..." : "Add with AI"}
+              </button>
             </div>
-            {aiError && <div className="text-red-500 text-xs mt-1">{aiError}</div>}
+            {aiError && (
+              <div className="text-red-500 text-xs mt-1">{aiError}</div>
+            )}
             {aiSuggestions && (
-              <div className="border rounded p-2 mt-2 bg-gray-50">
-                <div className="font-semibold mb-1">AI Suggestions:</div>
-                <ul className="mb-2">
-                  {aiSuggestions.map((item, idx) => (
-                    <li key={idx} className="flex items-center gap-2 mb-1">
-                      <span>{item}</span>
-                      <button type="button" className="text-xs text-red-500 hover:underline" onClick={() => handleAIDeleteItem(idx)}>Delete</button>
-                    </li>
-                  ))}
-                </ul>
-                <div className="flex gap-2">
-                  <Button type="button" size="sm" onClick={handleAIApprove}>
-                    Approve
-                  </Button>
-                  <Button type="button" size="sm" variant="outline" onClick={handleAIReject}>
-                    Reject
-                  </Button>
+              <div className="mt-3 bg-white border border-gray-200 rounded-lg overflow-hidden">
+                <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
+                  <h4 className="text-sm font-semibold text-gray-900">
+                    AI Suggestions
+                  </h4>
+                </div>
+                <div className="px-4 py-3">
+                  <ul className="space-y-2 mb-4">
+                    {aiSuggestions.map((item, idx) => (
+                      <li
+                        key={idx}
+                        className="flex items-start justify-between gap-3 py-1"
+                      >
+                        <span className="text-sm text-gray-700 flex-1 leading-relaxed">
+                          {item}
+                        </span>
+                        <button
+                          type="button"
+                          className="text-xs text-gray-500 hover:text-gray-700 transition-colors duration-200 font-medium shrink-0"
+                          onClick={() => handleAIDeleteItem(idx)}
+                        >
+                          Remove
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="flex gap-2 pt-2 border-t border-gray-100">
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={handleAIApprove}
+                      className="bg-black text-white hover:bg-gray-800 text-xs px-4 py-2"
+                    >
+                      Use suggestions
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={handleAIReject}
+                      className="border-gray-300 text-gray-700 hover:bg-gray-50 text-xs px-4 py-2"
+                    >
+                      Dismiss
+                    </Button>
+                  </div>
                 </div>
               </div>
             )}

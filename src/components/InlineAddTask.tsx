@@ -1,11 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import {
-  X,
-  Flag,
-  MoreHorizontal,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { X, Flag, MoreHorizontal, ChevronLeft, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -46,7 +40,7 @@ interface InlineAddTaskProps {
   onAdd: (
     title: string,
     description?: string,
-    priority?: "low" | "medium" | "high" | "none", 
+    priority?: "low" | "medium" | "high" | "none",
     deadline_at?: string
   ) => void;
   onCancel: () => void;
@@ -104,7 +98,8 @@ const InlineAddTask = ({ onAdd, onCancel }: InlineAddTaskProps) => {
   useEffect(() => {
     if (descriptionRef.current) {
       descriptionRef.current.style.height = "auto";
-      descriptionRef.current.style.height = descriptionRef.current.scrollHeight + "px";
+      descriptionRef.current.style.height =
+        descriptionRef.current.scrollHeight + "px";
     }
   }, [description]);
 
@@ -173,37 +168,71 @@ const InlineAddTask = ({ onAdd, onCancel }: InlineAddTaskProps) => {
         onKeyDown={handleKeyDown}
         className="w-full"
       >
-        <Input
-          ref={titleInputRef}
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Task name"
-          className="font-medium placeholder:text-gray-400 mt-1 h-8 px-0 py-0 placeholder:text-left text-sm border-none focus-visible:ring-0 focus-visible:ring-transparent focus-visible:ring-offset-0 focus:outline-none ring-0 ring-transparent"
-        />
-        <div className="flex gap-2 mt-2 mb-1">
-          <Button type="button" variant="secondary" onClick={handleAISuggest} disabled={aiLoading || !title.trim()} size="sm">
-            {aiLoading ? "Suggesting..." : "Suggest with AI"}
-          </Button>
+        <div className="flex items-center gap-2 mt-1">
+          <Input
+            ref={titleInputRef}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Task name"
+            className="flex-1 font-medium placeholder:text-gray-400 h-8 px-0 py-0 placeholder:text-left text-sm border-none focus-visible:ring-0 focus-visible:ring-transparent focus-visible:ring-offset-0 focus:outline-none ring-0 ring-transparent"
+          />
+          <button
+            type="button"
+            onClick={handleAISuggest}
+            disabled={aiLoading || !title.trim()}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-1 hover:bg-gray-50"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-gray-600" />
+            {aiLoading ? "Suggesting..." : "Suggestions with AI"}
+          </button>
         </div>
         {aiError && <div className="text-red-500 text-xs mt-1">{aiError}</div>}
         {aiSuggestions && (
-          <div className="border rounded p-2 mt-2 bg-gray-50">
-            <div className="font-semibold mb-1">AI Suggestions:</div>
-            <ul className="mb-2">
-              {aiSuggestions.map((item, idx) => (
-                <li key={idx} className="flex items-center gap-2 mb-1">
-                  <span>{item}</span>
-                  <button type="button" className="text-xs text-red-500 hover:underline" onClick={() => handleAIDeleteItem(idx)}>Delete</button>
-                </li>
-              ))}
-            </ul>
-            <div className="flex gap-2">
-              <Button type="button" size="sm" onClick={handleAIApprove}>
-                Approve
-              </Button>
-              <Button type="button" size="sm" variant="outline" onClick={handleAIReject}>
-                Reject
-              </Button>
+          <div className="mt-2 mb-3 bg-white border border-gray-200 rounded-lg overflow-hidden">
+            <div className="px-4 py-2 border-gray-200">
+              <h4 className="text-sm font-semibold text-gray-700">
+                AI Suggestions
+              </h4>
+            </div>
+            <div className="px-4">
+              <ul className="space-y-1 mb-2">
+                {aiSuggestions.map((item, idx) => (
+                  <li
+                    key={idx}
+                    className="flex items-start justify-between gap-3 "
+                  >
+                    <span className="text-sm text-gray-700 flex-1 leading-relaxed">
+                      {item}
+                    </span>
+                    <button
+                      type="button"
+                      className="text-xs text-gray-500 hover:text-gray-700 transition-colors duration-200 font-medium shrink-0"
+                      onClick={() => handleAIDeleteItem(idx)}
+                    >
+                      Remove
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              <div className="flex gap-2 pt-2 border-t border-gray-100">
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={handleAIApprove}
+                  className="bg-gray-700 text-white hover:bg-gray-900 text-xs px-2 mb-2"
+                >
+                  Use suggestions
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={handleAIReject}
+                  className="border-gray-300 text-gray-700 hover:bg-gray-50 text-xs px-4 py-2"
+                >
+                  Dismiss
+                </Button>
+              </div>
             </div>
           </div>
         )}
@@ -216,7 +245,7 @@ const InlineAddTask = ({ onAdd, onCancel }: InlineAddTaskProps) => {
           className="min-h-[32px] mb-0 placeholder:text-gray-400 text-[13px] px-0 py-0 placeholder:text-left focus:outline-none border-none focus:ring-0 focus:ring-transparent focus:ring-offset-0"
         />
 
-        {/* ⬇️ Các nút Date, Priority, Reminders, More luôn hiện và đặt ngay dưới Description */}
+
         <div className="flex gap-2 mb-3">
           <div className="flex items-center h-7 text-xs text-gray-600">
             <DatePicker
